@@ -8,7 +8,6 @@ const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MES
 
 bot.once("ready", () => {
     console.log("Ready!");
-
 });
 
 bot.login(DISCORD_TOKEN);
