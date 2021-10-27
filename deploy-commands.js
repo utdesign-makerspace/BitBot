@@ -5,8 +5,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const commands = [];
-const commandFiles = fs
-  .readdirSync('./commands')
+fs.readdirSync('./commands')
   .filter((file) => file.endsWith('.js'))
   .forEach((file) => {
     const command = require(`./commands/${file}`);
