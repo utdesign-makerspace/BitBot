@@ -15,7 +15,6 @@ services:
     ports:
       - 27017:27017
   octoprint:
-    octoprint:
     image: octoprint/octoprint
     restart: unless-stopped
     ports:

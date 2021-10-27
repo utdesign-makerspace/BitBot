@@ -42,3 +42,12 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(DISCORD_TOKEN);
+
+mongoose.connect(MONGODB_SRV, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(()=>{
+    console.log("Connected to the database.");
+}).catch((err)=> {
+    console.log(err);
+});
