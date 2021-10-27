@@ -10,7 +10,7 @@ const commands = fs
   .map((file) => {
     const command = require(`./commands/${file}`);
     if (command.context) return command.data;
-    return commands.push(command.data.toJSON());
+    return command.data.toJSON();
   });
 
 const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN);
