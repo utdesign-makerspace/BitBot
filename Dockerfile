@@ -1,4 +1,4 @@
-FROM node:current-alpine
+FROM node:16.6.0
 
 WORKDIR /opt/bitbot
 COPY package.json .
