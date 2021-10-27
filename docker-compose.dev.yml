@@ -4,6 +4,8 @@ services:
     build: .
     links:
       - db
+    environment:
+      MONGODB_SRV: mongodb://root:example@db
   db:
     image: mongo
     restart: always
