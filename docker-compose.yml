@@ -1,0 +1,12 @@
+version: '3.9' # optional since v1.27.0
+services:
+  bot:
+    build: .
+    links:
+      - db
+  db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
