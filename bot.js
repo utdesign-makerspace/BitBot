@@ -1,9 +1,10 @@
 require('dotenv').config();
 
-const { DISCORD_TOKEN } = process.env;
+const { DISCORD_TOKEN, MONGODB_SRV } = process.env;
 
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
+const mongoose = require('mongoose');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -35,5 +36,14 @@ client.on('interactionCreate', async interaction => {
 		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
+
+mongoose.connect(MONGODB_SRV, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(()=>{
+    console.log("Connected to the database.");
+}).catch((err)=> {
+    console.log(err);
+})
 
 client.login(DISCORD_TOKEN);
