@@ -12,5 +12,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - db:/data/db
+  octoprint:
+    octoprint:
+    image: octoprint/octoprint
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - octoprint:/octoprint
 volumes:
   db:
+  octoprint:
