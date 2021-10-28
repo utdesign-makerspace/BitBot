@@ -39,22 +39,35 @@ module.exports = {
       .setTimestamp();
 
     // TODO: Add if statements to check if available, in use, or offline
-    const {
-      data: {
-        state: printerState,
-        progress: { printTimeLeft }
-      }
-    } = await axios({
-      method: 'get',
-      url: `http${printer.ssl ? 's' : ''}://${printer.ip}/api/job`,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + printer.apikey
-      },
-      httpsAgent: new https.Agent({
-        rejectUnauthorized: false
-      })
-    });
+    try {
+      var {
+        data: {
+          state: printerState,
+          progress: { printTimeLeft }
+        }
+      } = await axios({
+        method: 'get',
+        url: `http${printer.ssl ? 's' : ''}://${printer.ip}/api/job`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + printer.apikey
+        },
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false
+        })
+      });
+    } catch (error) {
+      console.log(error);
+      // If we get an error, we assume the printer is offline
+      statusEmbed
+        .setTitle('🔴  Printer Offline')
+        .addField('Available', 'Probably not', true)
+        .addField(
+          'More Info',
+          'The octoprint session is offline or has been disconnected from the internal network. This is usually indiciative of a catastrophic system failure.'
+        );
+      return interaction.editReply({ embeds: [statusEmbed], ephemeral: true });
+    }
 
     const { data: snapshotData } = await axios({
       method: 'get',
@@ -71,7 +84,19 @@ module.exports = {
       Buffer.from(snapshotData, 'utf-8'),
       'snapshot.jpg'
     );
-
+    try {
+      printerState;
+    } catch (error) {
+      console.log(error);
+      statusEmbed
+        .setTitle('🔴  Printer Offline')
+        .addField('Available', 'Probably', true)
+        .addField(
+          'More Info',
+          'It is very likely that the printer is off or octoprint has been disconnected to '
+        );
+      return interaction.editReply({ embeds: [statusEmbed], ephemeral: true });
+    }
     if (printerState !== 'Printing') {
       // example is available
       statusEmbed
