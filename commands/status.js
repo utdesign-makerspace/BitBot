@@ -75,7 +75,7 @@ module.exports = {
         printer.ip
       }/webcam/?action=snapshot`,
       httpsAgent: new https.Agent({
-        regjectUnauthorized: false
+        rejectUnauthorized: false
       }),
       responseType: 'arraybuffer'
     });
