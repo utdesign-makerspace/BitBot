@@ -11,47 +11,48 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 client.commands = new Collection();
 
 fs.readdirSync('./commands')
-  .filter((file) => file.endsWith('.js'))
-  .forEach((file) => {
-    const command = require(`./commands/${file}`);
-    // Set a new item in the Collection
-    // With the key as the command name and the value as the exported module
-    client.commands.set(command.data.name, command);
-  });
+	.filter((file) => file.endsWith('.js'))
+	.forEach((file) => {
+		const command = require(`./commands/${file}`);
+		// Set a new item in the Collection
+		// With the key as the command name and the value as the exported module
+		client.commands.set(command.data.name, command);
+	});
 
 client.once('ready', () => {
-  console.log('Ready!');
+	console.log('Ready!');
 });
 
 client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isCommand()) return;
+	if (!interaction.isCommand()) return;
 
-  const command = client.commands.get(interaction.commandName);
+	const command = client.commands.get(interaction.commandName);
 
-  if (!command) return;
+	if (!command) return;
 
-  try {
-	if (command.ephemeral)
-	  await interaction.deferReply({ ephemeral: true });
-	else
-	  await interaction.deferReply();
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({
-      content: 'There was an error while executing this command!',
-      ephemeral: true
-    });
-  }
+	try {
+		if (command.ephemeral) await interaction.deferReply({ ephemeral: true });
+		else await interaction.deferReply();
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.editReply({
+			content: 'There was an error while executing this command!',
+			ephemeral: true
+		});
+	}
 });
 
 client.login(DISCORD_TOKEN);
 
-mongoose.connect(MONGODB_SRV, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(()=>{
-    console.log("Connected to the database.");
-}).catch((err)=> {
-    console.log(err);
-});
+mongoose
+	.connect(MONGODB_SRV, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	})
+	.then(() => {
+		console.log('Connected to the database.');
+	})
+	.catch((err) => {
+		console.log(err);
+	});
