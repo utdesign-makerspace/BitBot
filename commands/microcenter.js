@@ -18,7 +18,7 @@ module.exports = {
         'https://www.microcenter.com/product/465902/c4labs-zebra-zero-raspberry-pi-zero-type-2-case-black-ice'
       );
     const embed = new MessageEmbed()
-      .setTitle(name)
+      .setTitle(name.split('-')[0])
       .setURL(url)
       .setColor('#0099ff')
       .addFields([
