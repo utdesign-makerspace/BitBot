@@ -3,8 +3,11 @@ require('dotenv').config();
 const { DISCORD_TOKEN, MONGODB_SRV } = process.env;
 
 const fs = require('fs');
+const Discord = require('discord.js');
 const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
+const constants = require('./lib/constants');
+const printers = require('./lib/printers');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
@@ -24,7 +27,53 @@ client.once('ready', () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-	if (!interaction.isCommand()) return;
+	if (!interaction.isCommand() && !interaction.isButton()) return;
+
+	if (interaction.isButton()) {
+		let id = interaction.customId;
+
+		if (id.startsWith(constants.status.showButtonId)) {
+			// TODO: Shorten this, maybe make a buttons folder like commands
+			interaction.deferUpdate();
+			const printerID = id.substring(id.indexOf(constants.status.showButtonId)+constants.status.showButtonId.length);
+			let msg = await printers.getMessage(printerID, true);
+			const hideButton = new Discord.MessageButton({
+                customId: `${constants.status.hideButtonId}${printerID}`,
+                label: constants.status.hideButtonText,
+                style: 'SECONDARY',
+            });
+            const cancelButton = new Discord.MessageButton({
+                customId: `${constants.status.cancelButtonId}${printerID}`,
+                label: constants.status.cancelButtonText,
+                style: 'DANGER',
+                disabled: true,
+            });
+			const buttonRow = new Discord.MessageActionRow().addComponents(hideButton, cancelButton,);
+            msg.components = [buttonRow];
+			msg.attachments = [];
+			await interaction.editReply(msg);
+		} else if (id.startsWith(constants.status.hideButtonId)) {
+			// TODO: Shorten this, maybe make a buttons folder like commands
+			interaction.deferUpdate();
+			const printerID = id.substring(id.indexOf(constants.status.hideButtonId)+constants.status.hideButtonId.length);
+			let msg = await printers.getMessage(printerID, false);
+			const showButton = new Discord.MessageButton({
+                customId: `${constants.status.showButtonId}${printerID}`,
+                label: constants.status.showButtonText,
+                style: 'SECONDARY',
+            });
+            const cancelButton = new Discord.MessageButton({
+                customId: `${constants.status.cancelButtonId}${printerID}`,
+                label: constants.status.cancelButtonText,
+                style: 'DANGER',
+                disabled: true,
+            });
+			const buttonRow = new Discord.MessageActionRow().addComponents(showButton, cancelButton,);
+            msg.components = [buttonRow];
+			msg.attachments = [];
+			await interaction.editReply(msg);
+		}
+	}
 
 	const command = client.commands.get(interaction.commandName);
 
