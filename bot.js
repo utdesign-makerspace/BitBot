@@ -3,16 +3,12 @@ require('dotenv').config();
 const { DISCORD_TOKEN, MONGODB_SRV } = process.env;
 
 const fs = require('fs');
-const Discord = require('discord.js');
 const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
-const constants = require('./lib/constants');
-const printers = require('./lib/printers');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 
 client.commands = new Collection();
-
 fs.readdirSync('./commands')
 	.filter((file) => file.endsWith('.js'))
 	.forEach((file) => {
@@ -20,6 +16,16 @@ fs.readdirSync('./commands')
 		// Set a new item in the Collection
 		// With the key as the command name and the value as the exported module
 		client.commands.set(command.data.name, command);
+	});
+
+client.buttons = new Collection();
+fs.readdirSync('./buttons')
+	.filter((file) => file.endsWith('.js'))
+	.forEach((file) => {
+		const button = require(`./buttons/${file}`);
+		// Set a new item in the Collection
+		// With the key as the command name and the value as the exported module
+		client.buttons.set(button.id, button);
 	});
 
 client.once('ready', () => {
@@ -30,54 +36,17 @@ client.on('interactionCreate', async (interaction) => {
 	if (!interaction.isCommand() && !interaction.isButton()) return;
 
 	if (interaction.isButton()) {
-		let id = interaction.customId;
+		let args = interaction.customId.split(" ");
+		let id = args.shift();
 
-		if (id.startsWith(constants.status.showButtonId)) {
-			// TODO: Shorten this, maybe make a buttons folder like commands
-			interaction.deferUpdate();
-			const printerID = id.substring(id.indexOf(constants.status.showButtonId)+constants.status.showButtonId.length);
-			// Get the message options for the printer
-			let msg = await printers.getMessage(printerID, true);
-			// Create the buttons
-			const hideButton = new Discord.MessageButton({
-                customId: `${constants.status.hideButtonId}${printerID}`,
-                label: constants.status.hideButtonText,
-                style: 'SECONDARY',
-            });
-            const cancelButton = new Discord.MessageButton({
-                customId: `${constants.status.cancelButtonId}${printerID}`,
-                label: constants.status.cancelButtonText,
-                style: 'DANGER',
-                disabled: true,
-            });
-			const buttonRow = new Discord.MessageActionRow().addComponents(hideButton, cancelButton,);
-			// Modify our message options
-            msg.components = [buttonRow];
-			msg.attachments = []; // This gets rid of previous images (I think? At least it stopped the overflow crash)
-			await interaction.editReply(msg);
-		} else if (id.startsWith(constants.status.hideButtonId)) {
-			// TODO: Shorten this, maybe make a buttons folder like commands
-			interaction.deferUpdate();
-			const printerID = id.substring(id.indexOf(constants.status.hideButtonId)+constants.status.hideButtonId.length);
-			// Get the message options for the printer
-			let msg = await printers.getMessage(printerID, false);
-			// Create the buttons
-			const showButton = new Discord.MessageButton({
-                customId: `${constants.status.showButtonId}${printerID}`,
-                label: constants.status.showButtonText,
-                style: 'SECONDARY',
-            });
-            const cancelButton = new Discord.MessageButton({
-                customId: `${constants.status.cancelButtonId}${printerID}`,
-                label: constants.status.cancelButtonText,
-                style: 'DANGER',
-                disabled: true,
-            });
-			const buttonRow = new Discord.MessageActionRow().addComponents(showButton, cancelButton,);
-			// Modify our message options
-            msg.components = [buttonRow];
-			msg.attachments = []; // This gets rid of previous images (I think? At least it stopped the overflow crash)
-			await interaction.editReply(msg);
+		const button = client.buttons.get(id);
+
+		if (!button) return;
+
+		try {
+			await button.execute(interaction, args);
+		} catch (error) {
+			console.error(error); // Since we don't know what every button will do, we can't tell the user
 		}
 	}
 

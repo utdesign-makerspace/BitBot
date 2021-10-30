@@ -26,12 +26,12 @@ module.exports = {
             // Create the buttons
             // TODO: Make cancel button enabled if user that started the print OR an officer
             const viewButton = new Discord.MessageButton({
-                customId: `${constants.status.showButtonId}${printerID}`,
+                customId: `${constants.status.detailsButtonId} ${printerID} 1`,
                 label: constants.status.showButtonText,
                 style: 'SECONDARY',
             });
             const cancelButton = new Discord.MessageButton({
-                customId: `${constants.status.cancelButtonId}${printerID}`,
+                customId: `${constants.status.cancelButtonId} ${printerID}`,
                 label: constants.status.cancelButtonText,
                 style: 'DANGER',
                 disabled: true,
