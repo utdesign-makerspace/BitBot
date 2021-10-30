@@ -36,7 +36,9 @@ client.on('interactionCreate', async (interaction) => {
 			// TODO: Shorten this, maybe make a buttons folder like commands
 			interaction.deferUpdate();
 			const printerID = id.substring(id.indexOf(constants.status.showButtonId)+constants.status.showButtonId.length);
+			// Get the message options for the printer
 			let msg = await printers.getMessage(printerID, true);
+			// Create the buttons
 			const hideButton = new Discord.MessageButton({
                 customId: `${constants.status.hideButtonId}${printerID}`,
                 label: constants.status.hideButtonText,
@@ -49,14 +51,17 @@ client.on('interactionCreate', async (interaction) => {
                 disabled: true,
             });
 			const buttonRow = new Discord.MessageActionRow().addComponents(hideButton, cancelButton,);
+			// Modify our message options
             msg.components = [buttonRow];
-			msg.attachments = [];
+			msg.attachments = []; // This gets rid of previous images (I think? At least it stopped the overflow crash)
 			await interaction.editReply(msg);
 		} else if (id.startsWith(constants.status.hideButtonId)) {
 			// TODO: Shorten this, maybe make a buttons folder like commands
 			interaction.deferUpdate();
 			const printerID = id.substring(id.indexOf(constants.status.hideButtonId)+constants.status.hideButtonId.length);
+			// Get the message options for the printer
 			let msg = await printers.getMessage(printerID, false);
+			// Create the buttons
 			const showButton = new Discord.MessageButton({
                 customId: `${constants.status.showButtonId}${printerID}`,
                 label: constants.status.showButtonText,
@@ -69,8 +74,9 @@ client.on('interactionCreate', async (interaction) => {
                 disabled: true,
             });
 			const buttonRow = new Discord.MessageActionRow().addComponents(showButton, cancelButton,);
+			// Modify our message options
             msg.components = [buttonRow];
-			msg.attachments = [];
+			msg.attachments = []; // This gets rid of previous images (I think? At least it stopped the overflow crash)
 			await interaction.editReply(msg);
 		}
 	}

@@ -21,7 +21,10 @@ module.exports = {
         let msg;
         
 		if (printerID !== null) {
+            // Grab our message options
             msg = await printers.getMessage(printerID, false);
+            // Create the buttons
+            // TODO: Make cancel button enabled if user that started the print OR an officer
             const viewButton = new Discord.MessageButton({
                 customId: `${constants.status.showButtonId}${printerID}`,
                 label: constants.status.showButtonText,
@@ -39,6 +42,8 @@ module.exports = {
             msg = await farm.getFarmEmbed();
         }
 
+        // Set ephemeral because we don't need everyone to see the status. We can change this once bot
+        // is live and we have a #bot-commands channel to avoid overflow.
         msg.ephemeral = true;
         interaction.editReply(msg);
 	}
