@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const constants = require('../lib/constants');
 const printers = require('../lib/printers');
+const farm = require('../lib/farm');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -35,12 +36,7 @@ module.exports = {
             const buttonRow = new Discord.MessageActionRow().addComponents(viewButton, cancelButton,);
             msg.components = [buttonRow];
         } else {
-            let statusEmbed = new Discord.MessageEmbed()
-				.setColor('#c1393d')
-				.setTitle(':information_source:  Printer Status')
-				.setFooter('Printers are first come, first served')
-				.setTimestamp();
-			return interaction.editReply({ embeds: [statusEmbed], ephemeral: true });
+            msg = await farm.getFarmEmbed();
         }
 
         msg.ephemeral = true;
