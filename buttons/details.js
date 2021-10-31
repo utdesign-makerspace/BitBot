@@ -32,6 +32,9 @@ module.exports = {
             style: 'DANGER',
             disabled: true,
         });
+        // Allow stopping print if officer
+        if (interaction.member.roles.cache.some(role => role.name === constants.officerRoleName))
+            cancelButton.setDisabled(false);
 		const buttonRow = new Discord.MessageActionRow().addComponents(detailsButton, cancelButton,);
 
 		// Modify our message options

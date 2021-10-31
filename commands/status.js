@@ -24,7 +24,6 @@ module.exports = {
             // Grab our message options
             msg = await printers.getMessage(printerID, false);
             // Create the buttons
-            // TODO: Make cancel button enabled if user that started the print OR an officer
             const viewButton = new Discord.MessageButton({
                 customId: `${constants.status.detailsButtonId} ${printerID} 1`,
                 label: constants.status.showButtonText,
@@ -36,6 +35,9 @@ module.exports = {
                 style: 'DANGER',
                 disabled: true,
             });
+            // Allow stopping print if officer
+            if (interaction.member.roles.cache.some(role => role.name === constants.officerRoleName))
+                cancelButton.setDisabled(false);
             const buttonRow = new Discord.MessageActionRow().addComponents(viewButton, cancelButton,);
             msg.components = [buttonRow];
         } else {
