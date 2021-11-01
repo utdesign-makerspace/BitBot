@@ -1,38 +1,39 @@
 {
-  "name": "bit-bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "bot.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "start": "node bot.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/utdesign-makerspace/Bit-Bot.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/utdesign-makerspace/Bit-Bot/issues"
-  },
-  "homepage": "https://github.com/utdesign-makerspace/Bit-Bot#readme",
-  "dependencies": {
-    "@discordjs/builders": "^0.7.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "axios": "^0.24.0",
-    "discord-api-types": "^0.24.0",
-    "discord.js": "^13.1.0",
-    "dotenv": "^10.0.0",
-    "humanize-duration": "^3.27.0",
-    "mongoose": "^6.0.12"
-  },
-  "devDependencies": {
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.25.2",
-    "prettier": "^2.4.1"
-  }
+	"name": "bit-bot",
+	"version": "1.0.0",
+	"description": "",
+	"main": "bot.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+		"start": "node bot.js",
+		"deploy": "node deploy-commands.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/utdesign-makerspace/Bit-Bot.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/utdesign-makerspace/Bit-Bot/issues"
+	},
+	"homepage": "https://github.com/utdesign-makerspace/Bit-Bot#readme",
+	"dependencies": {
+		"@discordjs/builders": "^0.7.0",
+		"@discordjs/rest": "^0.1.0-canary.0",
+		"axios": "^0.24.0",
+		"discord-api-types": "^0.24.0",
+		"discord.js": "^13.1.0",
+		"dotenv": "^10.0.0",
+		"humanize-duration": "^3.27.0",
+		"mongoose": "^6.0.12"
+	},
+	"devDependencies": {
+		"eslint": "^7.32.0",
+		"eslint-config-airbnb-base": "^14.2.1",
+		"eslint-plugin-import": "^2.25.2",
+		"prettier": "^2.4.1"
+	}
 }
