@@ -29,7 +29,8 @@
 		"discord.js": "^13.1.0",
 		"dotenv": "^10.0.0",
 		"humanize-duration": "^3.27.0",
-		"mongoose": "^6.0.12"
+		"mongoose": "^6.0.12",
+		"qs": "^6.10.1"
 	},
 	"devDependencies": {
 		"eslint": "^7.32.0",
