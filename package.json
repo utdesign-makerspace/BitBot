@@ -31,7 +31,8 @@
 		"humanize-duration": "^3.27.0",
 		"ldapjs": "^2.3.1",
 		"ldapjs-promise": "^1.0.6",
-		"mongoose": "^6.0.12"
+		"mongoose": "^6.0.12",
+		"mqtt": "^4.2.8"
 	},
 	"devDependencies": {
 		"eslint": "^7.32.0",
