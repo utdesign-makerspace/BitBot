@@ -5,9 +5,10 @@ const { DISCORD_TOKEN, MONGODB_SRV } = process.env;
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
+const cron = require('cron');
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-
+const jobs = [];
 client.commands = new Collection();
 fs.readdirSync('./commands')
 	.filter((file) => file.endsWith('.js'))
@@ -30,13 +31,35 @@ fs.readdirSync('./buttons')
 
 client.once('ready', () => {
 	console.log('Ready!');
+	fs.readdirSync('./jobs')
+		.filter((file) => file.endsWith('.js'))
+		.forEach((file) => {
+			const job = require(`./jobs/${file}`);
+			// Set a new item in the Collection
+			// With the key as the command name and the value as the exported module
+			const cronJob = new cron.CronJob(
+				job.cron,
+				() => {
+					try {
+						job.action();
+					} catch (error) {
+						console.error(error);
+					}
+				},
+				null,
+				true,
+				'America/Los_Angeles'
+			);
+			cronJob.start();
+			jobs.push(cronJob);
+		});
 });
 
 client.on('interactionCreate', async (interaction) => {
 	if (!interaction.isCommand() && !interaction.isButton()) return;
 
 	if (interaction.isButton()) {
-		let args = interaction.customId.split(" ");
+		let args = interaction.customId.split(' ');
 		let id = args.shift();
 
 		const button = client.buttons.get(id);
@@ -55,7 +78,8 @@ client.on('interactionCreate', async (interaction) => {
 	if (!command) return;
 
 	try {
-		if (command.ephemeral) await interaction.deferReply({ ephemeral: true });
+		if (command.ephemeral)
+			await interaction.deferReply({ ephemeral: true });
 		else await interaction.deferReply();
 		await command.execute(interaction);
 	} catch (error) {
