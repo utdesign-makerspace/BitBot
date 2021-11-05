@@ -8,13 +8,14 @@ const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt');
 const constants = require('./lib/constants');
+const cron = require('cron');
 
 const mqttClient = mqtt.connect(MQTT_HOST, {
 	username: MQTT_USER,
 	password: MQTT_PASS
 });
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
-
+const jobs = [];
 client.commands = new Collection();
 fs.readdirSync('./commands')
 	.filter((file) => file.endsWith('.js'))
@@ -41,6 +42,28 @@ fs.readdirSync('./printer_events')
 
 client.once('ready', () => {
 	console.log('Ready!');
+	fs.readdirSync('./jobs')
+		.filter((file) => file.endsWith('.js'))
+		.forEach((file) => {
+			const job = require(`./jobs/${file}`);
+			// Set a new item in the Collection
+			// With the key as the command name and the value as the exported module
+			const cronJob = new cron.CronJob(
+				job.cron,
+				() => {
+					try {
+						job.action();
+					} catch (error) {
+						console.error(error);
+					}
+				},
+				null,
+				true,
+				'America/Los_Angeles'
+			);
+			cronJob.start();
+			jobs.push(cronJob);
+		});
 });
 
 client.on('interactionCreate', async (interaction) => {
