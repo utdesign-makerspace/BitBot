@@ -10,9 +10,12 @@ const mqtt = require('mqtt');
 const constants = require('./lib/constants');
 const cron = require('cron');
 const Sentry = require('@sentry/node');
-const Tracing = require('@sentry/tracing');
+require('./helpers/deploy-commands')();
 
-if (process.env.NODE_ENV === 'production') {
+if (
+	process.env.NODE_ENV === 'production' &&
+	process.env.hasOwnProperty('SENTRY_DSN')
+) {
 	Sentry.init({
 		dsn: process.env.SENTRY_DSN,
 		tracesSampleRate: 1.0
@@ -23,6 +26,7 @@ const mqttClient = mqtt.connect(MQTT_HOST, {
 	username: MQTT_USER,
 	password: MQTT_PASS
 });
+
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const jobs = [];
 client.commands = new Collection();
