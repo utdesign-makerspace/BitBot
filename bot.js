@@ -27,7 +27,7 @@ fs.readdirSync('./commands')
 
 client.buttons = new Collection();
 
-//Look for all .js files in the buttons folder regardless of folder depth
+// Look for all .js files in the buttons folder regardless of folder depth
 glob('./buttons/**/*.js', (err, files) => {
 	files.forEach((file) => {
 		const button = require(file);
