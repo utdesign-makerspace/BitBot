@@ -5,4 +5,4 @@ COPY package.json .
 RUN npm install --quiet
 COPY . .
 
-CMD npm run prod
+CMD npm start
