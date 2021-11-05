@@ -20,8 +20,6 @@ fs.readdirSync('./commands')
 	.filter((file) => file.endsWith('.js'))
 	.forEach((file) => {
 		const command = require(`./commands/${file}`);
-		// Set a new item in the Collection
-		// With the key as the command name and the value as the exported module
 		client.commands.set(command.data.name, command);
 	});
 
@@ -30,9 +28,15 @@ fs.readdirSync('./buttons')
 	.filter((file) => file.endsWith('.js'))
 	.forEach((file) => {
 		const button = require(`./buttons/${file}`);
-		// Set a new item in the Collection
-		// With the key as the command name and the value as the exported module
 		client.buttons.set(button.id, button);
+	});
+
+client.printerEvents = new Collection();
+fs.readdirSync('./printer_events')
+	.filter((file) => file.endsWith('.js'))
+	.forEach((file) => {
+		const printerEvent = require(`./printer_events/${file}`);
+		client.printerEvents.set(printerEvent.name, printerEvent);
 	});
 
 client.once('ready', () => {
@@ -107,13 +111,28 @@ mqttClient.on('connect', async function () {
 	console.log('Subscribed to MQTT events.');
 });
 
-mqttClient.on('message', function (topic, message) {
-	const json = JSON.parse(message.toString());
+mqttClient.on('message', async function (topic, message) {
+	const data = JSON.parse(message.toString());
 
 	// If the timestamp of the event is older than five seconds, ignore it
 	const now = new Date();
-	if (now - new Date(json._timestamp * 1000) > 5000) return;
+	if (now - new Date(data._timestamp * 1000) > 5000) return;
 
-	// Print message to console
-	console.log(message.toString());
+	// Grab the printer name
+	const printerId = constants.printers.indexOf(
+		constants.printers.find(
+			(p) => p.name.toLowerCase() === topic.split('/')[0]
+		)
+	);
+
+	// Run the printer event
+	const event = client.printerEvents.get(data._event);
+
+	if (!event) return;
+
+	try {
+		await event.execute(data, printerId, client);
+	} catch (error) {
+		console.error(error);
+	}
 });
