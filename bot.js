@@ -9,6 +9,15 @@ const mongoose = require('mongoose');
 const mqtt = require('mqtt');
 const constants = require('./lib/constants');
 const cron = require('cron');
+const Sentry = require('@sentry/node');
+const Tracing = require('@sentry/tracing');
+
+if (process.env.NODE_ENV === 'production') {
+	Sentry.init({
+		dsn: process.env.SENTRY_DSN,
+		tracesSampleRate: 1.0
+	});
+}
 
 const mqttClient = mqtt.connect(MQTT_HOST, {
 	username: MQTT_USER,
