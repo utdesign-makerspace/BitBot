@@ -1,15 +1,13 @@
 {
-    "env": {
-        "commonjs": true,
-        "es2021": true,
-        "node": true
-    },
-    "extends": [
-        "airbnb-base"
-    ],
-    "parserOptions": {
-        "ecmaVersion": 13
-    },
-    "rules": {
-    }
+	"env": {
+		"commonjs": true,
+		"es2021": true,
+		"node": true
+	},
+	"extends": ["airbnb-base", "prettier", "eslint:recommended"],
+	"parserOptions": {
+		"ecmaVersion": 13
+	},
+	"rules": {},
+	"prettier/prettier": ["error"]
 }
