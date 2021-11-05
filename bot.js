@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const mqtt = require('mqtt');
 const constants = require('./lib/constants');
 const cron = require('cron');
+const glob = require('glob');
 
 const mqttClient = mqtt.connect(MQTT_HOST, {
 	username: MQTT_USER,
@@ -25,12 +26,14 @@ fs.readdirSync('./commands')
 	});
 
 client.buttons = new Collection();
-fs.readdirSync('./buttons')
-	.filter((file) => file.endsWith('.js'))
-	.forEach((file) => {
-		const button = require(`./buttons/${file}`);
+
+//Look for all .js files in the buttons folder regardless of folder depth
+glob('./buttons/**/*.js', (err, files) => {
+	files.forEach((file) => {
+		const button = require(file);
 		client.buttons.set(button.id, button);
 	});
+});
 
 client.printerEvents = new Collection();
 fs.readdirSync('./printer_events')
