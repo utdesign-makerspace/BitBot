@@ -10,6 +10,7 @@ module.exports = {
 		// If there is no user, we can't do anything. Otherwise, get the user.
 		if (!ldapUser || !ldapUser.discord) return;
 		const user = await client.users.fetch(ldapUser.discord);
+		if (!user) return;
 
 		// Construct our embed.
 		const embed = await printers.getEmbedTemplate(printerId);
