@@ -1,12 +1,19 @@
 require('dotenv').config();
 
-const { DISCORD_TOKEN, MONGODB_SRV } = process.env;
+const { DISCORD_TOKEN, MONGODB_SRV, MQTT_HOST, MQTT_USER, MQTT_PASS } =
+	process.env;
 
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
+const mqtt = require('mqtt');
+const constants = require('./lib/constants');
 const cron = require('cron');
 
+const mqttClient = mqtt.connect(MQTT_HOST, {
+	username: MQTT_USER,
+	password: MQTT_PASS
+});
 const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
 const jobs = [];
 client.commands = new Collection();
@@ -14,8 +21,6 @@ fs.readdirSync('./commands')
 	.filter((file) => file.endsWith('.js'))
 	.forEach((file) => {
 		const command = require(`./commands/${file}`);
-		// Set a new item in the Collection
-		// With the key as the command name and the value as the exported module
 		client.commands.set(command.data.name, command);
 	});
 
@@ -24,9 +29,15 @@ fs.readdirSync('./buttons')
 	.filter((file) => file.endsWith('.js'))
 	.forEach((file) => {
 		const button = require(`./buttons/${file}`);
-		// Set a new item in the Collection
-		// With the key as the command name and the value as the exported module
 		client.buttons.set(button.id, button);
+	});
+
+client.printerEvents = new Collection();
+fs.readdirSync('./printer_events')
+	.filter((file) => file.endsWith('.js'))
+	.forEach((file) => {
+		const printerEvent = require(`./printer_events/${file}`);
+		client.printerEvents.set(printerEvent.name, printerEvent);
 	});
 
 client.once('ready', () => {
@@ -104,3 +115,47 @@ mongoose
 	.catch((err) => {
 		console.log(err);
 	});
+
+mqttClient.on('connect', async function () {
+	console.log('MQTT connected.');
+
+	const printerArray = constants.printers;
+	for (let i = 0; i < printerArray.length; i++) {
+		const printer = printerArray[i];
+		mqttClient.subscribe(
+			`${printer.name.toLowerCase()}/event/PrintStarted`
+		);
+		mqttClient.subscribe(
+			`${printer.name.toLowerCase()}/event/PrintCancelled`
+		);
+		mqttClient.subscribe(`${printer.name.toLowerCase()}/event/PrintDone`);
+	}
+
+	console.log('Subscribed to MQTT events.');
+});
+
+mqttClient.on('message', async function (topic, message) {
+	const data = JSON.parse(message.toString());
+
+	// If the timestamp of the event is older than five seconds, ignore it
+	const now = new Date();
+	if (now - new Date(data._timestamp * 1000) > 5000) return;
+
+	// Grab the printer name
+	const printerId = constants.printers.indexOf(
+		constants.printers.find(
+			(p) => p.name.toLowerCase() === topic.split('/')[0]
+		)
+	);
+
+	// Run the printer event
+	const event = client.printerEvents.get(data._event);
+
+	if (!event) return;
+
+	try {
+		await event.execute(data, printerId, client);
+	} catch (error) {
+		console.error(error);
+	}
+});
