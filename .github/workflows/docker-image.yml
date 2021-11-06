@@ -23,4 +23,4 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag utdmakerspace/bit-bot:$(date +%s)
     - name: Docker Push
-      run: docker push ${{secrets.DOCKER_USER}}/bit-bot
+      run: docker push utdmakerspace/bit-bot
