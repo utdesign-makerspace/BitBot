@@ -67,6 +67,9 @@ client.once('ready', () => {
 					try {
 						job.action();
 					} catch (error) {
+						if (process.env.NODE_ENV === 'production') {
+							Sentry.captureException(error);
+						}
 						console.error(error);
 					}
 				},
@@ -94,6 +97,9 @@ client.on('interactionCreate', async (interaction) => {
 			await button.execute(interaction, args);
 		} catch (error) {
 			console.error(error); // Since we don't know what every button will do, we can't tell the user
+			if (process.env.NODE_ENV === 'production') {
+				Sentry.captureException(error);
+			}
 		}
 	}
 
@@ -108,6 +114,9 @@ client.on('interactionCreate', async (interaction) => {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
+		if (process.env.NODE_ENV === 'production') {
+			Sentry.captureException(error);
+		}
 		await interaction.editReply({
 			content: 'There was an error while executing this command!',
 			ephemeral: true
@@ -170,5 +179,8 @@ mqttClient.on('message', async function (topic, message) {
 		await event.execute(data, printerId, client);
 	} catch (error) {
 		console.error(error);
+		if (process.env.NODE_ENV === 'production') {
+			Sentry.captureException(error);
+		}
 	}
 });
