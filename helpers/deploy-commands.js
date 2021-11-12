@@ -30,9 +30,6 @@ function deployCommands() {
 				'Successfully reloaded application (/) guild commands.'
 			);
 		} catch (error) {
-			if (process.env.NODE_ENV === 'production') {
-				Sentry.captureException(error);
-			}
 			console.error(error);
 		}
 	})();
