@@ -8,7 +8,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('status')
 		.setDescription('Gives the status of 3D printers.')
-		.addIntegerOption((option) =>
+		.addStringOption((option) =>
 			option
 				.setName('printer')
 				.setDescription('3D printer to check the status of')
@@ -16,7 +16,7 @@ module.exports = {
 		),
 	ephemeral: true,
 	async execute(interaction) {
-		const printerID = interaction.options.getInteger('printer');
+		const printerID = interaction.options.getString('printer');
 
 		let msg;
 
