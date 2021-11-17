@@ -141,7 +141,11 @@ mongoose
 mqttClient.on('connect', async function () {
 	console.log('MQTT connected.');
 
-	const printerArray = constants.printers;
+	const printerArray = Object.keys(constants.printers).map((key) => {
+		const data = constants.printers[key];
+		data.lookup = key;
+		return data;
+	});
 	for (let i = 0; i < printerArray.length; i++) {
 		const printer = printerArray[i];
 		mqttClient.subscribe(
@@ -164,11 +168,7 @@ mqttClient.on('message', async function (topic, message) {
 	if (now - new Date(data._timestamp * 1000) > 5000) return;
 
 	// Grab the printer name
-	const printerId = constants.printers.indexOf(
-		constants.printers.find(
-			(p) => p.name.toLowerCase() === topic.split('/')[0]
-		)
-	);
+	const printerId = topic.split('/')[0];
 
 	// Run the printer event
 	const event = client.printerEvents.get(data._event);
