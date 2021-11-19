@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
+const ldap = require('../lib/ldap');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,12 +23,29 @@ module.exports = {
 			member = interaction.guild.members.cache.get(memberOption.id);
 		}
 
+		// Grab the LDAP member
+		const ldapMember = await ldap.getUserByDiscord(member.id);
+
 		let profileEmbed = new Discord.MessageEmbed()
 			.setColor('#c1393d')
 			.setAuthor(
 				member.displayName,
 				member.displayAvatarURL({ dynamic: true })
 			);
+		// If there doesn't exist a linked account, add it to the embed
+		if (!ldapMember) {
+			profileEmbed
+				.setTitle('No linked account')
+				.setDescription(
+					'This user has not linked their Discord account to their UTDesign Makerspace account. For more information, use /link.'
+				);
+		} else {
+			// Otherwise, assuming there is a linked account...
+			profileEmbed
+				.setTitle(`${ldapMember.givenName} ${ldapMember.sn}`)
+				.addField('3D Printer Trained', 'Yes', true)
+				.addField('Bits', '999999', true);
+		}
 
 		interaction.editReply({ embeds: [profileEmbed] });
 	}
