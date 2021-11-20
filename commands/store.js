@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
+const constants = require('../lib/constants');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -28,6 +29,29 @@ module.exports = {
 				'All redemptions are final. We do not accept real-world currency (ex. USD, Ethereum, etc.) or items (ex. filament, technology, etc.) in exchange for rewards.'
 			);
 
-		interaction.editReply({ embeds: [storeEmbed] });
+		// Create a select menu with all the items in the store.
+		const selectMenu = new Discord.MessageSelectMenu()
+			.setCustomId('store')
+			.setPlaceholder('Select a reward for more information');
+		Object.keys(constants.rewards).forEach((key) => {
+			const reward = constants.rewards[key];
+			selectMenu.addOptions([
+				{
+					label: reward.name,
+					description: `${reward.price} Bits`,
+					value: key,
+					emoji: reward.emoji ? reward.emoji : '🏆'
+				}
+			]);
+		});
+		const selectRow = new Discord.MessageActionRow().addComponents(
+			selectMenu
+		);
+
+		// Post the store embed.
+		interaction.editReply({
+			embeds: [storeEmbed],
+			components: [selectRow]
+		});
 	}
 };
