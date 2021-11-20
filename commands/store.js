@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
-const constants = require('../lib/constants');
+const rewards = require('../lib/rewards');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -30,20 +30,7 @@ module.exports = {
 			);
 
 		// Create a select menu with all the items in the store.
-		const selectMenu = new Discord.MessageSelectMenu()
-			.setCustomId('store')
-			.setPlaceholder('Select a reward for more information');
-		Object.keys(constants.rewards).forEach((key) => {
-			const reward = constants.rewards[key];
-			selectMenu.addOptions([
-				{
-					label: reward.name,
-					description: `${reward.price} Bits`,
-					value: key,
-					emoji: reward.emoji ? reward.emoji : '🏆'
-				}
-			]);
-		});
+		const selectMenu = await rewards.getSelectMenu();
 		const selectRow = new Discord.MessageActionRow().addComponents(
 			selectMenu
 		);

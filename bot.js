@@ -45,6 +45,14 @@ fs.readdirSync('./buttons')
 		client.buttons.set(button.id, button);
 	});
 
+client.selectMenus = new Collection();
+fs.readdirSync('./select_menus')
+	.filter((file) => file.endsWith('.js'))
+	.forEach((file) => {
+		const selectMenu = require(`./select_menus/${file}`);
+		client.selectMenus.set(selectMenu.id, selectMenu);
+	});
+
 client.printerEvents = new Collection();
 fs.readdirSync('./printer_events')
 	.filter((file) => file.endsWith('.js'))
@@ -83,9 +91,30 @@ client.once('ready', () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-	if (!interaction.isCommand() && !interaction.isButton()) return;
+	// Get rid of interactions we don't care about
+	if (
+		!interaction.isCommand() &&
+		!interaction.isButton() &&
+		!interaction.isSelectMenu()
+	)
+		return;
 
-	if (interaction.isButton()) {
+	if (interaction.isSelectMenu()) {
+		// Handles select menus
+		const selectMenu = client.selectMenus.get(interaction.customId);
+
+		if (!selectMenu) return;
+
+		try {
+			await selectMenu.execute(interaction);
+		} catch (error) {
+			console.error(error); // Since we don't know what every button will do, we can't tell the user
+			if (process.env.NODE_ENV === 'production') {
+				Sentry.captureException(error);
+			}
+		}
+	} else if (interaction.isButton()) {
+		// Handles buttons
 		let args = interaction.customId.split(' ');
 		let id = args.shift();
 
@@ -101,26 +130,27 @@ client.on('interactionCreate', async (interaction) => {
 				Sentry.captureException(error);
 			}
 		}
-	}
+	} else {
+		// Handles commands (no other type of interaction left)
+		const command = client.commands.get(interaction.commandName);
 
-	const command = client.commands.get(interaction.commandName);
+		if (!command) return;
 
-	if (!command) return;
-
-	try {
-		if (command.ephemeral)
-			await interaction.deferReply({ ephemeral: true });
-		else await interaction.deferReply();
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (process.env.NODE_ENV === 'production') {
-			Sentry.captureException(error);
+		try {
+			if (command.ephemeral)
+				await interaction.deferReply({ ephemeral: true });
+			else await interaction.deferReply();
+			await command.execute(interaction);
+		} catch (error) {
+			console.error(error);
+			if (process.env.NODE_ENV === 'production') {
+				Sentry.captureException(error);
+			}
+			await interaction.editReply({
+				content: 'There was an error while executing this command!',
+				ephemeral: true
+			});
 		}
-		await interaction.editReply({
-			content: 'There was an error while executing this command!',
-			ephemeral: true
-		});
 	}
 });
 
