@@ -10,6 +10,7 @@ const mqtt = require('mqtt');
 const constants = require('./lib/constants');
 const cron = require('cron');
 const Sentry = require('@sentry/node');
+const farm = require('./lib/farm');
 require('./helpers/deploy-commands')();
 
 if (
@@ -53,8 +54,66 @@ fs.readdirSync('./printer_events')
 		client.printerEvents.set(printerEvent.name, printerEvent);
 	});
 
-client.once('ready', () => {
+client.once('ready', async () => {
 	console.log('Ready!');
+
+	// Presence system initialization
+	farmState = await farm.getFarmState();
+	availablePrinters = 0;
+	printerCount = Object.keys(constants.printers).length;
+	for (i = 0; i < farmState.length; i++) {
+		let state;
+		if (farmState[i])
+			state = constants.states.get(farmState[i].toLowerCase());
+
+		if (farmState[i] && state == 'available') availablePrinters++;
+	}
+	client.user.setPresence({
+		activities: [
+			{
+				name: `${availablePrinters}/${printerCount} printers in use`,
+				type: 'WATCHING'
+			}
+		],
+		// If no printers available, DND. If printers available, idle. If all printers available, online.
+		status:
+			availablePrinters == 0
+				? 'dnd'
+				: availablePrinters != printerCount
+				? 'idle'
+				: 'online'
+	});
+
+	// Presence system loop
+	setInterval(async () => {
+		farmState = await farm.getFarmState();
+		availablePrinters = 0;
+		printerCount = Object.keys(constants.printers).length;
+		for (i = 0; i < farmState.length; i++) {
+			let state;
+			if (farmState[i])
+				state = constants.states.get(farmState[i].toLowerCase());
+
+			if (farmState[i] && state == 'available') availablePrinters++;
+		}
+		client.user.setPresence({
+			activities: [
+				{
+					name: `${availablePrinters}/${printerCount} printers in use`,
+					type: 'WATCHING'
+				}
+			],
+			// If no printers available, DND. If printers available, idle. If all printers available, online.
+			status:
+				availablePrinters == 0
+					? 'dnd'
+					: availablePrinters != printerCount
+					? 'idle'
+					: 'online'
+		});
+	}, 5 * 60 * 1000);
+
+	// Cron job system
 	fs.readdirSync('./jobs')
 		.filter((file) => file.endsWith('.js'))
 		.forEach((file) => {
