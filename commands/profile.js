@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const Discord = require('discord.js');
 const ldap = require('../lib/ldap');
+const constants = require('../lib/constants');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -41,16 +42,70 @@ module.exports = {
 				);
 		} else {
 			// Otherwise, assuming there is a linked account...
+
+			// Grab their groups
+			const groups = await ldap.getGroupsByUsername(ldapMember.cn);
+
+			// Create the base embed
 			profileEmbed
 				.setTitle(`${ldapMember.givenName} ${ldapMember.sn}`)
-				.setDescription('<:MakerspaceOfficer:940693728308379669>')
-				.addField('Bits', '1000', true)
-				.addField('Total Bits', '100000', true)
-				.addField('Membership Status', 'Officer', true)
-				.addField('Training', '3D Printing\nLaser Cutting', false)
-				.addField('Awards', 'Makerspace Game of the Year 2022', false);
-		}
+				.addField('Bits', 'WIP', true)
+				.addField('Total Bits', 'WIP', true);
 
+			// Add membership status
+			if (member.roles.cache.some((role) => role.name == 'Staff'))
+				profileEmbed.addField('Membership Status', 'Staff', true);
+			else if (member.roles.cache.some((role) => role.name == 'Officer'))
+				profileEmbed.addField('Membership Status', 'Officer', true);
+			else if (
+				member.roles.cache.some((role) =>
+					role.name.includes('Committee')
+				)
+			)
+				profileEmbed.addField(
+					'Membership Status',
+					'Committee Member',
+					true
+				);
+			else profileEmbed.addField('Membership Status', 'Member', true);
+
+			// Add trainings
+			let trainings = '';
+			if (groups.some((group) => group.cn === 'trained-3dprinting'))
+				trainings += '3D Printing\n';
+			if (groups.some((group) => group.cn === 'trained-lasercutting'))
+				trainings += 'Laser Cutting\n';
+			if (trainings) profileEmbed.addField('Training', trainings, false);
+
+			// Add awards
+			// NEEDS TO BE ADDED, WAITING ON LDAP CHANGES
+			// profileEmbed.addField(
+			// 	'Awards',
+			// 	'Makerspace Game of the Year 2022',
+			// 	false
+			// );
+
+			// Add badges
+			// AWARD AND DONOR NEED TO BE ADDED
+			let badges = '';
+			if (
+				member.roles.cache.some(
+					(role) => role.name == 'Staff' || role.name == 'Officer'
+				)
+			)
+				badges += '<:MakerspaceOfficer:940693728308379669> ';
+			else if (
+				member.roles.cache.some((role) =>
+					role.name.includes('Committee')
+				)
+			)
+				badges += '<:CommitteeMember:941081405507633162> ';
+			if (groups.some((group) => group.cn === 'arcadedev'))
+				badges += '<:ArcadeGameDeveloper:941081405297942649> ';
+			if (constants.contributors.includes(member.id))
+				badges += '<:BitBotContributor:941081405650251827> ';
+			profileEmbed.setDescription(badges);
+		}
 		interaction.editReply({ embeds: [profileEmbed] });
 	}
 };
