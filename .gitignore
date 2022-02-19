@@ -108,3 +108,6 @@ build/
 
 # Lockfiles
 package-lock.json
+
+# Private credentials
+google-credentials.json
