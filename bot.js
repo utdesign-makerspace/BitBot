@@ -92,8 +92,6 @@ client.once('ready', async () => {
 });
 
 client.on('interactionCreate', async (interaction) => {
-	if (!interaction.isCommand() && !interaction.isButton()) return;
-
 	if (interaction.isButton()) {
 		let args = interaction.customId.split(' ');
 		let id = args.shift();
@@ -111,6 +109,8 @@ client.on('interactionCreate', async (interaction) => {
 			}
 		}
 	}
+
+	if (!interaction.isCommand() && !interaction.isContextMenu()) return;
 
 	const command = client.commands.get(interaction.commandName);
 
