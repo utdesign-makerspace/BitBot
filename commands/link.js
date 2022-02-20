@@ -9,7 +9,10 @@ module.exports = {
 	ephemeral: true,
 	execute: async (interaction) => {
 		const embed = new Discord.MessageEmbed()
-			.setAuthor('UTDesign Makerspace', 'https://i.imgur.com/lSwBDLb.png')
+			.setAuthor({
+				name: 'UTDesign Makerspace',
+				iconURL: 'https://i.imgur.com/lSwBDLb.png'
+			})
 			.setColor('#c1393d');
 
 		ldap.getUserByDiscord(interaction.user.id)

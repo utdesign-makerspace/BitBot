@@ -1,6 +1,6 @@
 const calendar = require('../lib/calendar.js');
 module.exports = {
-	cron: '* */1 * * * *',
+	cron: '0 0 * * * *',
 	action: async (client) => {
 		const guilds = [...client.guilds.cache.values()];
 		console.log(guilds);

@@ -9,11 +9,11 @@ module.exports = {
 	async execute(interaction) {
 		const helpEmbed = new Discord.MessageEmbed()
 			.setColor('#c1393d')
-			.setAuthor(
-				'UTDesign Makerspace',
-				'https://i.imgur.com/lSwBDLb.png',
-				'https://utdmaker.space/'
-			)
+			.setAuthor({
+				name: 'UTDesign Makerspace',
+				iconURL: 'https://i.imgur.com/lSwBDLb.png',
+				url: 'https://utdmaker.space/'
+			})
 			.setThumbnail(
 				'https://cdn.discordapp.com/avatars/628033792505806868/bea690b7691970aecf066edd9d3c9fe1.png?size=512'
 			)
