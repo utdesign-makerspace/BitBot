@@ -74,7 +74,7 @@ client.once('ready', async () => {
 				job.cron,
 				() => {
 					try {
-						job.action();
+						job.action(client);
 					} catch (error) {
 						if (process.env.NODE_ENV === 'production') {
 							Sentry.captureException(error);
