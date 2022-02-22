@@ -1,8 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js');
 const constants = require('../lib/constants');
 const printers = require('../lib/printers');
-const farm = require('../lib/farm');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -10,6 +8,7 @@ module.exports = {
 		.setDescription(
 			'Enables or disables maintenance mode on a printer depending on if a reason is given.'
 		)
+		.setDefaultPermission(false)
 		.addStringOption((option) =>
 			option
 				.setName('printer')

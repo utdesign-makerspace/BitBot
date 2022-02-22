@@ -1,7 +1,14 @@
 require('dotenv').config();
 
-const { DISCORD_TOKEN, MONGODB_SRV, MQTT_HOST, MQTT_USER, MQTT_PASS } =
-	process.env;
+const {
+	DISCORD_TOKEN,
+	MONGODB_SRV,
+	MQTT_HOST,
+	MQTT_USER,
+	MQTT_PASS,
+	OFFICER_ID,
+	GUILD_ID
+} = process.env;
 
 const fs = require('fs');
 const { Client, Collection, Intents } = require('discord.js');
@@ -89,6 +96,30 @@ client.once('ready', async () => {
 			cronJob.start();
 			jobs.push(cronJob);
 		});
+
+	// Update permissions
+	const guildCommands = await client.guilds.cache
+		.get(GUILD_ID)
+		.commands.fetch();
+	const permissions = [
+		{
+			id: OFFICER_ID,
+			type: 'ROLE',
+			permission: true
+		}
+	];
+	console.log('Updating command permissions.');
+	client.commands.each((cmd) => {
+		if (!cmd.context) {
+			const command = guildCommands.find((c) => c.name == cmd.data.name);
+			if (command && cmd.data.defaultPermission == false) {
+				command.permissions.add({ permissions });
+				console.log(
+					`Added officer permission to ${cmd.data.name} command.`
+				);
+			}
+		}
+	});
 });
 
 client.on('interactionCreate', async (interaction) => {
