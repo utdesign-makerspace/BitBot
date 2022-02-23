@@ -11,6 +11,7 @@ const {
 } = process.env;
 
 const fs = require('fs');
+const read = require('fs-readdir-recursive');
 const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt');
@@ -46,7 +47,7 @@ fs.readdirSync('./commands')
 	});
 
 client.buttons = new Collection();
-fs.readdirSync('./buttons')
+read('./buttons')
 	.filter((file) => file.endsWith('.js'))
 	.forEach((file) => {
 		const button = require(`./buttons/${file}`);

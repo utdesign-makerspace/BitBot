@@ -1,5 +1,5 @@
-const constants = require('../lib/constants');
-const printers = require('../lib/printers');
+const constants = require('../../lib/constants');
+const printers = require('../../lib/printers');
 const Discord = require('discord.js');
 
 module.exports = {
