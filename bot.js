@@ -144,6 +144,22 @@ client.on('interactionCreate', async (interaction) => {
 		}
 	}
 
+	if (interaction.isAutocomplete()) {
+		if (interaction.commandName === 'leaderboard') {
+			const focused = interaction.options.getFocused();
+			const filteredOptions = gameTitles.filter((choice) =>
+				choice.toLowerCase().includes(focused.toLowerCase())
+			);
+
+			await interaction.respond(
+				filteredOptions.map((choice) => ({
+					name: choice,
+					value: choice
+				}))
+			);
+		}
+	}
+
 	if (!interaction.isCommand() && !interaction.isContextMenu()) return;
 
 	const command = client.commands.get(interaction.commandName);
@@ -224,17 +240,22 @@ mongoose
 	})
 	.then(() => {
 		console.log('Connected to the database.');
+		gameModel.find({}).exec((err, games) => {
+			gameTitles = games.map((g) => g.title);
+		});
 	})
 	.catch((err) => {
 		console.log(err);
 	});
 
 const server = Express();
+let gameTitles = [];
 
 server.use(BodyParser.json());
 server.use(BodyParser.urlencoded({ extended: true }));
 
 const cardModel = require('./lib/models/cardSchema');
+const gameModel = require('./lib/models/gameSchema');
 
 server.get('/', (request, response) => {
 	response.send(
@@ -243,12 +264,14 @@ server.get('/', (request, response) => {
 });
 server.get('/:secret/cards/:cc', async (request, response, next) => {
 	try {
-		if (request.params.secret != 'wiener') response.send(null);
+		let game = await gameModel.findOne({ secret: request.params.secret });
+
+		if (!game) response.send(null);
 		else {
-			let result = await cardModel.findOne({
+			let card = await cardModel.findOne({
 				cometCard: request.params.cc
 			});
-			response.send(result);
+			response.send(card);
 		}
 	} catch (e) {
 		response.status(500).send({ message: e.message });
