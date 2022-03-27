@@ -77,7 +77,6 @@ module.exports = {
 
 						const card = await leaderboard.createCard(
 							cometCard,
-							interaction.user.id,
 							user.cn
 						);
 						if (card) {

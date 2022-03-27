@@ -14,6 +14,8 @@ const fs = require('fs');
 const read = require('fs-readdir-recursive');
 const { Client, Collection, Intents } = require('discord.js');
 const mongoose = require('mongoose');
+const Express = require('express');
+const BodyParser = require('body-parser');
 const mqtt = require('mqtt');
 const constants = require('./lib/constants');
 const cron = require('cron');
@@ -215,7 +217,6 @@ mqttClient.on('message', async function (topic, message) {
 });
 
 // MongoDB and leaderboard system
-
 mongoose
 	.connect(MONGODB_SRV, {
 		useNewUrlParser: true,
@@ -227,3 +228,37 @@ mongoose
 	.catch((err) => {
 		console.log(err);
 	});
+
+const server = Express();
+
+server.use(BodyParser.json());
+server.use(BodyParser.urlencoded({ extended: true }));
+
+const cardModel = require('./lib/models/cardSchema');
+
+server.get('/', (request, response) => {
+	response.send(
+		'This site is not accessible through the web. If you would like to view leaderboards, please use our Discord bot.'
+	);
+});
+server.get('/:secret/cards/:cc', async (request, response, next) => {
+	try {
+		if (request.params.secret != 'wiener') response.send(null);
+		else {
+			let result = await cardModel.findOne({
+				cometCard: request.params.cc
+			});
+			response.send(result);
+		}
+	} catch (e) {
+		response.status(500).send({ message: e.message });
+	}
+});
+
+server.listen('3000', async () => {
+	try {
+		console.log('Listening at port 3000...');
+	} catch (e) {
+		console.error(e);
+	}
+});
