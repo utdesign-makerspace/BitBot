@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const gameModel = require('../lib/models/gameSchema');
+const playerModel = require('../lib/models/playerSchema');
+const ldap = require('../lib/ldap');
 const Discord = require('discord.js');
 
 module.exports = {
@@ -33,15 +35,48 @@ module.exports = {
 			return interaction.editReply({ embeds: [embed] });
 		}
 
-		embed.setThumbnail(game.iconURL);
-		for (let i = 0; i < game.leaderboardNames.length; i++) {
-			embed.addField(
-				game.leaderboardNames[i],
-				`This leaderboard uses ${game.leaderboardTypes[i]} sorting.`,
-				false
-			);
-		}
+		playerModel
+			.find({ secret: game.secret })
+			.exec(async (err, playerData) => {
+				players = playerData.map((p) => {
+					return {
+						netId: p.netId,
+						scores: p.scores
+					};
+				});
 
-		return interaction.editReply({ embeds: [embed] });
+				embed.setThumbnail(game.iconURL);
+				for (let i = 0; i < game.leaderboardNames.length; i++) {
+					scores = players
+						.map((p) => {
+							return {
+								netId: p.netId,
+								score: p.scores[i]
+							};
+						})
+						.sort((a, b) => {
+							return b.score - a.score;
+						});
+
+					if (game.leaderboardTypes[i].includes('Descending'))
+						scores.reverse();
+
+					content = `This leaderboard uses ${game.leaderboardTypes[i]} sorting.`;
+
+					for (let j = 0; j < 5; j++) {
+						if (j >= scores.length) break;
+
+						let ldapUser = await ldap.getUserByUsername(
+							scores[j].netId
+						);
+						// TODO: Add a different display for times.
+						content += `\n${scores[j].score} - <@${ldapUser.discord}>`;
+					}
+
+					embed.addField(game.leaderboardNames[i], content, false);
+				}
+
+				return interaction.editReply({ embeds: [embed] });
+			});
 	}
 };
