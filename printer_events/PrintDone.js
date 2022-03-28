@@ -12,8 +12,11 @@ module.exports = {
 		const user = await client.users.fetch(ldapUser.discord);
 		if (!user) return;
 
-		// Construct our embed.
-		const embed = await printers.getEmbedTemplate(printerId);
+		// Construct our embed and get snapshot
+		const [embed, snapshotBuffer] = await Promise.all([
+			printers.getEmbedTemplate(printerId),
+			printers.getSnapshotBuffer(printerId)
+		]);
 		embed
 			.setTitle('🎉  Print Completed')
 			.setDescription(
@@ -24,7 +27,7 @@ module.exports = {
 			.setTimestamp();
 
 		// Add image to embed.
-		const snapshotBuffer = await printers.getSnapshotBuffer(printerId);
+
 		let snapshot;
 		if (snapshotBuffer) {
 			snapshot = new Discord.MessageAttachment(
