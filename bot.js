@@ -291,6 +291,48 @@ server.get('/:secret/cards/:cc', async (request, response, next) => {
 		response.status(500).send({ message: e.message });
 	}
 });
+server.get('/:secret/score/:index', async (request, response, next) => {
+	try {
+		let game = await gameModel.findOne({ secret: request.params.secret });
+
+		if (!game) response.status(400).send({ message: 'Invalid game' });
+		else {
+			const index = request.params.index;
+			if (isNaN(index) || !game.leaderboardTypes[index])
+				response.status(400).send({ message: 'Invalid score index' });
+
+			playerModel
+				.find({ secret: game.secret })
+				.exec(async (err, playerData) => {
+					players = playerData.map((p) => {
+						return {
+							netId: p.netId,
+							scores: p.scores
+						};
+					});
+
+					scores = players
+						.map((p) => {
+							return {
+								netId: p.netId,
+								score: p.scores[index]
+							};
+						})
+						.sort((a, b) => {
+							return b.score - a.score;
+						});
+
+					if (game.leaderboardTypes[index].includes('Descending'))
+						scores.reverse();
+
+					finalScores = scores.slice(0, 10);
+					response.send(finalScores);
+				});
+		}
+	} catch (e) {
+		response.status(500).send({ message: e.message });
+	}
+});
 server.post('/:secret/score/:index', async (request, response, next) => {
 	try {
 		let game = await gameModel.findOne({ secret: request.params.secret });
@@ -305,11 +347,7 @@ server.post('/:secret/score/:index', async (request, response, next) => {
 			const score = parseInt(request.body.score);
 			const index = parseInt(request.params.index);
 
-			if (
-				isNaN(index) ||
-				game.leaderboardNames.length <= index ||
-				index < 0
-			) {
+			if (isNaN(index) || !game.leaderboardNames[index]) {
 				response.status(400).send({ message: 'Invalid index' });
 			}
 
