@@ -256,11 +256,25 @@ server.use(BodyParser.urlencoded({ extended: true }));
 
 const cardModel = require('./lib/models/cardSchema');
 const gameModel = require('./lib/models/gameSchema');
+const playerModel = require('./lib/models/playerSchema');
 
 server.get('/', (request, response) => {
 	response.send(
 		'This site is not accessible through the web. If you would like to view leaderboards, please use our Discord bot.'
 	);
+});
+server.get('/:secret/cards', async (request, response, next) => {
+	try {
+		let game = await gameModel.findOne({ secret: request.params.secret });
+
+		if (!game) response.send(null);
+		else {
+			let cards = await cardModel.find({});
+			response.send(cards);
+		}
+	} catch (e) {
+		response.status(500).send({ message: e.message });
+	}
 });
 server.get('/:secret/cards/:cc', async (request, response, next) => {
 	try {
@@ -272,6 +286,63 @@ server.get('/:secret/cards/:cc', async (request, response, next) => {
 				cometCard: request.params.cc
 			});
 			response.send(card);
+		}
+	} catch (e) {
+		response.status(500).send({ message: e.message });
+	}
+});
+server.post('/:secret/score/:index', async (request, response, next) => {
+	try {
+		let game = await gameModel.findOne({ secret: request.params.secret });
+		let card = await cardModel.findOne({
+			cometCard: request.body.cometCard
+		});
+
+		if (!game) response.status(400).send({ message: 'Invalid game' });
+		else if (!card) response.status(400).send({ message: 'Invalid card' });
+		else {
+			const secret = game.secret;
+			const score = parseInt(request.body.score);
+			const index = parseInt(request.params.index);
+
+			if (
+				isNaN(index) ||
+				game.leaderboardNames.length <= index ||
+				index < 0
+			) {
+				response.status(400).send({ message: 'Invalid index' });
+			}
+
+			const descending =
+				game.leaderboardTypes[index].includes('Descending');
+
+			let player = await playerModel.findOne({
+				secret: secret,
+				netId: card.netId
+			});
+
+			if (!player) {
+				const arr = [];
+				while (arr.length < game.leaderboardNames.length) arr.push(-1);
+				player = await playerModel.create({
+					secret: secret,
+					netId: card.netId,
+					scores: arr
+				});
+				await player.save();
+			}
+
+			while (player.scores.length < game.leaderboardNames.length)
+				player.scores.push(-1);
+
+			if (player.scores[index] == null) player.scores[index] = score;
+			else
+				player.scores[index] = descending
+					? Math.max(score, player.scores[index])
+					: Math.min(score, player.scores[index]);
+			await player.save();
+
+			response.send(player);
 		}
 	} catch (e) {
 		response.status(500).send({ message: e.message });
