@@ -59,7 +59,7 @@ module.exports = {
 							return b.score - a.score;
 						});
 
-					if (game.leaderboardTypes[i].includes('Descending'))
+					if (game.leaderboardTypes[i].includes('Ascending'))
 						scores.reverse();
 
 					content = `This leaderboard uses ${game.leaderboardTypes[i]} sorting.`;
@@ -73,11 +73,19 @@ module.exports = {
 							scores[j].netId
 						);
 						if (!isTime)
-							content += `\n${scores[j].score} - <@${ldapUser.discord}>`;
+							content += `\n${scores[j].score} - ${
+								ldapUser
+									? `<@${ldapUser.discord}>`
+									: scores[j].netId
+							}`;
 						else
 							content += `\n${leaderboard.formatAsTime(
 								scores[j].score
-							)} - <@${ldapUser.discord}>`;
+							)} - ${
+								ldapUser
+									? `<@${ldapUser.discord}>`
+									: scores[j].netId
+							}`;
 					}
 
 					embed.addField(game.leaderboardNames[i], content, false);

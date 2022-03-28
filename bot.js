@@ -322,7 +322,7 @@ server.get('/:secret/score/:index', async (request, response, next) => {
 							return b.score - a.score;
 						});
 
-					if (game.leaderboardTypes[index].includes('Descending'))
+					if (game.leaderboardTypes[index].includes('Ascending'))
 						scores.reverse();
 
 					finalScores = scores.slice(0, 10);
