@@ -263,9 +263,23 @@ server.get('/', (request, response) => {
 		'This site is not accessible through the web. If you would like to view leaderboards, please use our Discord bot.'
 	);
 });
-server.get('/:secret/cards', async (request, response, next) => {
+
+// Restricted routes
+
+server.use(async (request, response, next) => {
+	console.log(request.headers);
+	if (!request.headers['secret']) {
+		response.status(401).send('No secret provided');
+		return;
+	}
+	const game = await gameModel.findOne({ secret: request.headers['secret'] });
+	response.locals.game = game;
+	next();
+});
+
+server.get('/cards', async (request, response, next) => {
 	try {
-		let game = await gameModel.findOne({ secret: request.params.secret });
+		let game = response.locals.game;
 
 		if (!game) response.send(null);
 		else {
@@ -276,9 +290,9 @@ server.get('/:secret/cards', async (request, response, next) => {
 		response.status(500).send({ message: e.message });
 	}
 });
-server.get('/:secret/cards/:cc', async (request, response, next) => {
+server.get('/cards/:cc', async (request, response, next) => {
 	try {
-		let game = await gameModel.findOne({ secret: request.params.secret });
+		let game = response.locals.game;
 
 		if (!game) response.send(null);
 		else {
@@ -291,9 +305,9 @@ server.get('/:secret/cards/:cc', async (request, response, next) => {
 		response.status(500).send({ message: e.message });
 	}
 });
-server.get('/:secret/score/:index', async (request, response, next) => {
+server.get('/score/:index', async (request, response, next) => {
 	try {
-		let game = await gameModel.findOne({ secret: request.params.secret });
+		let game = response.locals.game;
 
 		if (!game) response.status(400).send({ message: 'Invalid game' });
 		else {
@@ -333,9 +347,9 @@ server.get('/:secret/score/:index', async (request, response, next) => {
 		response.status(500).send({ message: e.message });
 	}
 });
-server.post('/:secret/score/:index', async (request, response, next) => {
+server.post('/score/:index', async (request, response, next) => {
 	try {
-		let game = await gameModel.findOne({ secret: request.params.secret });
+		let game = response.locals.game;
 		let card = await cardModel.findOne({
 			cometCard: request.body.cometCard
 		});
