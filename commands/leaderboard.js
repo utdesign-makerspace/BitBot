@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const gameModel = require('../lib/models/gameSchema');
 const playerModel = require('../lib/models/playerSchema');
+const leaderboard = require('../lib/leaderboard');
 const ldap = require('../lib/ldap');
 const Discord = require('discord.js');
 
@@ -63,14 +64,20 @@ module.exports = {
 
 					content = `This leaderboard uses ${game.leaderboardTypes[i]} sorting.`;
 
+					const isTime = game.leaderboardTypes[i].includes('Time');
+
 					for (let j = 0; j < 5; j++) {
 						if (j >= scores.length) break;
 
 						let ldapUser = await ldap.getUserByUsername(
 							scores[j].netId
 						);
-						// TODO: Add a different display for times.
-						content += `\n${scores[j].score} - <@${ldapUser.discord}>`;
+						if (!isTime)
+							content += `\n${scores[j].score} - <@${ldapUser.discord}>`;
+						else
+							content += `\n${leaderboard.formatAsTime(
+								scores[j].score
+							)} - <@${ldapUser.discord}>`;
 					}
 
 					embed.addField(game.leaderboardNames[i], content, false);
