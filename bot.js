@@ -74,7 +74,7 @@ client.once('ready', async () => {
 	// Cron job system
 	fs.readdirSync('./jobs')
 		.filter((file) => file.endsWith('.js'))
-		.forEach((file) => {
+		.forEach(async (file) => {
 			const job = require(`./jobs/${file}`);
 			// Set a new item in the Collection
 			// With the key as the command name and the value as the exported module
@@ -96,6 +96,9 @@ client.once('ready', async () => {
 			);
 			cronJob.start();
 			jobs.push(cronJob);
+			if (job.runOnStart) {
+				await job.action(client);
+			}
 		});
 
 	// Update permissions
