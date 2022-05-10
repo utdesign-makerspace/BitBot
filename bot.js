@@ -102,28 +102,28 @@ client.once('ready', async () => {
 		});
 
 	// Update permissions
-	const guildCommands = await client.guilds.cache
-		.get(GUILD_ID)
-		.commands.fetch();
-	const permissions = [
-		{
-			id: OFFICER_ID,
-			type: 'ROLE',
-			permission: true
-		}
-	];
-	console.log('Updating command permissions.');
-	client.commands.each((cmd) => {
-		if (!cmd.context) {
-			const command = guildCommands.find((c) => c.name == cmd.data.name);
-			if (command && cmd.data.defaultPermission == false) {
-				command.permissions.add({ permissions });
-				console.log(
-					`Added officer permission to ${cmd.data.name} command.`
-				);
-			}
-		}
-	});
+	// const guildCommands = await client.guilds.cache
+	// 	.get(GUILD_ID)
+	// 	.commands.fetch();
+	// const permissions = [
+	// 	{
+	// 		id: OFFICER_ID,
+	// 		type: 'ROLE',
+	// 		permission: true
+	// 	}
+	// ];
+	// console.log('Updating command permissions.');
+	// client.commands.each((cmd) => {
+	// 	if (!cmd.context) {
+	// 		const command = guildCommands.find((c) => c.name == cmd.data.name);
+	// 		if (command && cmd.data.defaultPermission == false) {
+	// 			command.permissions.add({ permissions });
+	// 			console.log(
+	// 				`Added officer permission to ${cmd.data.name} command.`
+	// 			);
+	// 		}
+	// 	}
+	// });
 });
 
 client.on('interactionCreate', async (interaction) => {
