@@ -14,16 +14,14 @@ module.exports = {
 				iconURL: 'https://i.imgur.com/lSwBDLb.png',
 				url: 'https://utdmaker.space/'
 			})
-			.setThumbnail(
-				'https://cdn.discordapp.com/avatars/628033792505806868/bea690b7691970aecf066edd9d3c9fe1.png?size=512'
-			)
-			.setTitle('Bit-Bot v1')
+			.setThumbnail('https://i.imgur.com/lSwBDLb.png')
+			.setTitle('BitBot')
 			.setDescription(
-				'The UTDesign Makerspace Bot (Bit-Bot) has commands for controlling, monitoring, and learning about the makerspace.'
+				'BitBot is the official UTDesign Makerspace Discord bot. It has commands for controlling, monitoring, and learning more about the Makerspace.'
 			)
 			.addField(
 				'3D Printing',
-				'Check the status of printers at any time using /status. Link your Discord and UTDesign Makerspace accounts to receive notifications for your 3D prints.'
+				'Check the status of printers at any time using /status. Link your Discord and UTDesign Makerspace accounts using /link to receive notifications for your 3D prints.'
 			);
 		interaction.editReply({ embeds: [helpEmbed], ephemeral: true });
 	}

@@ -5,7 +5,15 @@ const ldap = require('../lib/ldap');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('link')
-		.setDescription('Checks your UTDesign Makerspace account link.'),
+		.setDescription(
+			'Links your Discord account to your UTDesign Makerspace account.'
+		)
+		.addStringOption((option) =>
+			option
+				.setName('netid')
+				.setDescription('Your NetID')
+				.setRequired(true)
+		),
 	ephemeral: true,
 	execute: async (interaction) => {
 		const embed = new Discord.MessageEmbed()
@@ -19,30 +27,55 @@ module.exports = {
 			.then((user) => {
 				if (user) {
 					embed
-						.setTitle(`Account Linked`)
+						.setTitle(`Account Already Linked`)
 						.setDescription(
-							`Your Discord account is linked to the UTDesign Makerspace account **${user.cn}**. For information on how this can benefit you, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
+							`Your Discord account is already linked to the UTDesign Makerspace account **${user.uid}**. Please contact an officer if this needs to be changed. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
 						);
+
+					const button = new Discord.MessageButton()
+						.setLabel('More Information')
+						.setURL('https://wiki.utdmaker.space/en/bitbot')
+						.setStyle('LINK');
+					const buttonRow =
+						new Discord.MessageActionRow().addComponents(button);
+
+					interaction.editReply({
+						embeds: [embed],
+						components: [buttonRow]
+					});
 				} else {
-					embed
-						.setTitle(`Account Not Linked`)
-						.setDescription(
-							`Your Discord account is not linked to a UTDesign Makerspace account. For information on how to link your accounts and how this can benefit you, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
-						);
+					const netid = interaction.options.getString('netid');
+					ldap.getUserByUsername(netid).then((netidUser) => {
+						if (netidUser) {
+							ldap.linkUserToDiscord(netid, interaction.user.id);
+							embed
+								.setTitle(`Account Linked`)
+								.setDescription(
+									`Your Discord account has been linked to the UTDesign Makerspace account **${netid}**. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
+								);
+						} else {
+							embed
+								.setTitle(`Account Not Found`)
+								.setDescription(
+									`The UTDesign Makerspace account **${netid}** could not be found. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
+								);
+						}
+
+						const button = new Discord.MessageButton()
+							.setLabel('More Information')
+							.setURL('https://wiki.utdmaker.space/en/bitbot')
+							.setStyle('LINK');
+						const buttonRow =
+							new Discord.MessageActionRow().addComponents(
+								button
+							);
+
+						interaction.editReply({
+							embeds: [embed],
+							components: [buttonRow]
+						});
+					});
 				}
-
-				const button = new Discord.MessageButton()
-					.setLabel('More Information')
-					.setURL('https://wiki.utdmaker.space/en/bitbot')
-					.setStyle('LINK');
-				const buttonRow = new Discord.MessageActionRow().addComponents(
-					button
-				);
-
-				interaction.editReply({
-					embeds: [embed],
-					components: [buttonRow]
-				});
 			})
 			.catch((err) => {
 				console.log(err);
