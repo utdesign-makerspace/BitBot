@@ -24,7 +24,7 @@ module.exports = {
 			label: 'Stop Cancellation',
 			style: 'DANGER'
 		});
-		const buttonRow = new Discord.MessageActionRow().addComponents(
+		const buttonRow = new Discord.ActionRowBuilder().addComponents(
 			cancelButton
 		);
 		// Send warning embed

@@ -46,7 +46,7 @@ module.exports = {
 			)
 		)
 			cancelButton.setDisabled(false);
-		const buttonRow = new Discord.MessageActionRow().addComponents(
+		const buttonRow = new Discord.ActionRowBuilder().addComponents(
 			refreshButton,
 			detailsButton
 		);

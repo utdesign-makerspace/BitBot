@@ -37,7 +37,7 @@ module.exports = {
 						.setURL('https://wiki.utdmaker.space/en/bitbot')
 						.setStyle('LINK');
 					const buttonRow =
-						new Discord.MessageActionRow().addComponents(button);
+						new Discord.ActionRowBuilder().addComponents(button);
 
 					interaction.editReply({
 						embeds: [embed],
@@ -66,7 +66,7 @@ module.exports = {
 							.setURL('https://wiki.utdmaker.space/en/bitbot')
 							.setStyle('LINK');
 						const buttonRow =
-							new Discord.MessageActionRow().addComponents(
+							new Discord.ActionRowBuilder().addComponents(
 								button
 							);
 
