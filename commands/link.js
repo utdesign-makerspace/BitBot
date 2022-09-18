@@ -16,7 +16,7 @@ module.exports = {
 		),
 	ephemeral: true,
 	execute: async (interaction) => {
-		const embed = new Discord.MessageEmbed()
+		const embed = new Discord.EmbedBuilder()
 			.setAuthor({
 				name: 'UTDesign Makerspace',
 				iconURL: 'https://i.imgur.com/lSwBDLb.png'
@@ -32,12 +32,12 @@ module.exports = {
 							`Your Discord account is already linked to the UTDesign Makerspace account **${user.uid}**. Please contact an officer if this needs to be changed. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
 						);
 
-					const button = new Discord.MessageButton()
+					const button = new Discord.ButtonBuilder()
 						.setLabel('More Information')
 						.setURL('https://wiki.utdmaker.space/en/bitbot')
 						.setStyle('LINK');
 					const buttonRow =
-						new Discord.MessageActionRow().addComponents(button);
+						new Discord.ActionRowBuilder().addComponents(button);
 
 					interaction.editReply({
 						embeds: [embed],
@@ -61,12 +61,12 @@ module.exports = {
 								);
 						}
 
-						const button = new Discord.MessageButton()
+						const button = new Discord.ButtonBuilder()
 							.setLabel('More Information')
 							.setURL('https://wiki.utdmaker.space/en/bitbot')
 							.setStyle('LINK');
 						const buttonRow =
-							new Discord.MessageActionRow().addComponents(
+							new Discord.ActionRowBuilder().addComponents(
 								button
 							);
 

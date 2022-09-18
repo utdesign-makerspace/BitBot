@@ -28,10 +28,9 @@ module.exports = {
 				// Add image to embed.
 				let snapshot;
 				if (snapshotBuffer) {
-					snapshot = new Discord.MessageAttachment(
-						snapshotBuffer,
-						'snapshot.jpg'
-					);
+					snapshot = new Discord.AttachmentBuilder(snapshotBuffer, {
+						name: 'snapshot.jpg'
+					});
 					embed.setImage('attachment://snapshot.jpg');
 				}
 

@@ -24,20 +24,20 @@ module.exports = {
 			// Grab our message options
 			msg = await printers.getMessage(printerID, false);
 			// Create the buttons
-			const refreshButton = new Discord.MessageButton({
+			const refreshButton = new Discord.ButtonBuilder({
 				customId: `${constants.status.detailsButtonId} ${printerID} 0`,
 				label: constants.status.refreshButtonText,
-				style: 'SECONDARY'
+				style: Discord.ButtonStyle.Secondary
 			});
-			const viewButton = new Discord.MessageButton({
+			const viewButton = new Discord.ButtonBuilder({
 				customId: `${constants.status.detailsButtonId} ${printerID} 1`,
 				label: constants.status.showButtonText,
-				style: 'SECONDARY'
+				style: Discord.ButtonStyle.Secondary
 			});
-			const cancelButton = new Discord.MessageButton({
+			const cancelButton = new Discord.ButtonBuilder({
 				customId: `${constants.status.cancelButtonId} ${printerID}`,
 				label: constants.status.cancelButtonText,
-				style: 'DANGER',
+				style: Discord.ButtonStyle.Danger,
 				disabled: true
 			});
 			// Allow stopping print if officer
@@ -47,7 +47,7 @@ module.exports = {
 				)
 			)
 				cancelButton.setDisabled(false);
-			const buttonRow = new Discord.MessageActionRow().addComponents(
+			const buttonRow = new Discord.ActionRowBuilder().addComponents(
 				refreshButton,
 				viewButton
 			);

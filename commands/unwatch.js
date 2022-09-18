@@ -25,7 +25,7 @@ module.exports = {
 		// Get the proper template
 		let embed;
 		if (printerID == null) {
-			embed = new Discord.MessageEmbed()
+			embed = new Discord.EmbedBuilder()
 				.setColor('#c1393d')
 				.setAuthor({ name: 'UTDesign Makerspace' })
 				.setTimestamp();
