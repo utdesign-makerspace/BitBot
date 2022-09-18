@@ -19,7 +19,7 @@ module.exports = {
 				'You have selected to cancel this print. This process is irreversible and your print progress will be lost. You have 30 seconds to change your mind.'
 			)
 			.setImage('attachment://snapshot.jpg');
-		const cancelButton = new Discord.MessageButton({
+		const cancelButton = new Discord.ButtonBuilder({
 			customId: `cancelthecancel ${interaction.id}`,
 			label: 'Stop Cancellation',
 			style: 'DANGER'

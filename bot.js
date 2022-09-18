@@ -12,7 +12,7 @@ const {
 
 const fs = require('fs');
 const read = require('fs-readdir-recursive');
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const mongoose = require('mongoose');
 const mqtt = require('mqtt');
 const constants = require('./lib/constants');
@@ -20,6 +20,7 @@ const cron = require('cron');
 const Sentry = require('@sentry/node');
 const farm = require('./lib/farm');
 require('./helpers/deploy-commands')();
+const snippetModel = require('./lib/models/snippetSchema');
 
 if (
 	process.env.NODE_ENV === 'production' &&
@@ -36,7 +37,7 @@ const mqttClient = mqtt.connect(MQTT_HOST, {
 	password: MQTT_PASS
 });
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const jobs = [];
 client.commands = new Collection();
 fs.readdirSync('./commands')
@@ -145,16 +146,108 @@ client.on('interactionCreate', async (interaction) => {
 		}
 	}
 
-	if (!interaction.isCommand() && !interaction.isContextMenu()) return;
+	if (interaction.isAutocomplete()) {
+		if (
+			interaction.commandName === 'snippet' ||
+			interaction.commandName === 'snipadmin'
+		) {
+			const focused = interaction.options.getFocused();
+			// create array filteredOptions with all snippets in database that contain user input in lowercase
+			const filteredOptions = await snippetModel.find({
+				title: { $regex: focused, $options: 'i' }
+			});
+
+			await interaction.respond(
+				filteredOptions.map((choice) => ({
+					name: choice.title,
+					value: choice.title
+				}))
+			);
+		}
+	}
+
+	if (interaction.customId === 'addSnippet') {
+		// create a new snippet in the database
+		let snip;
+		try {
+			snip = await snippetModel.findOne({
+				title: interaction.fields.getTextInputValue('title')
+			});
+
+			if (!snip) {
+				let snipData = {
+					title: interaction.fields.getTextInputValue('title'),
+					body: interaction.fields.getTextInputValue('body')
+				};
+				snip = await snippetModel.create(snipData);
+				await snip.save();
+				await interaction.reply({
+					content: `Snippet "${snip.title}" created!`,
+					ephemeral: true
+				});
+				return;
+			}
+
+			await interaction.reply({
+				content: 'A snippet with that name already exists.',
+				ephemeral: true
+			});
+			return;
+		} catch (err) {
+			console.log(err);
+			return;
+		}
+	}
+	if (
+		interaction.customId &&
+		interaction.customId.startsWith('editSnippet')
+	) {
+		// edit a snippet in the database
+		let snip;
+		try {
+			snip = await snippetModel.findOne({
+				_id: interaction.customId.substring(12)
+			});
+
+			if (!snip) {
+				await interaction.reply({
+					content: 'That snippet does not exist.',
+					ephemeral: true
+				});
+				return;
+			}
+
+			snip.title = interaction.fields.getTextInputValue('title');
+			snip.body = interaction.fields.getTextInputValue('body');
+			await snip.save();
+			await interaction.reply({
+				content: `Snippet "${snip.title}" edited!`,
+				ephemeral: true
+			});
+			return;
+		} catch (err) {
+			console.log(err);
+			return;
+		}
+	}
+
+	if (
+		!interaction.isCommand() &&
+		!interaction.isUserContextMenuCommand() &&
+		!interaction.isMessageContextMenuCommand()
+	)
+		return;
 
 	const command = client.commands.get(interaction.commandName);
 
 	if (!command) return;
 
 	try {
-		if (command.ephemeral)
-			await interaction.deferReply({ ephemeral: true });
-		else await interaction.deferReply();
+		if (!command.noDefer) {
+			if (command.ephemeral)
+				await interaction.deferReply({ ephemeral: true });
+			else await interaction.deferReply();
+		}
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);

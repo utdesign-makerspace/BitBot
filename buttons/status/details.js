@@ -19,12 +19,12 @@ module.exports = {
 		let msg = await printers.getMessage(printerID, detailed);
 
 		// Create the buttons
-		const refreshButton = new Discord.MessageButton({
+		const refreshButton = new Discord.ButtonBuilder({
 			customId: `${constants.status.detailsButtonId} ${printerID} ${args[1]}`,
 			label: constants.status.refreshButtonText,
 			style: 'SECONDARY'
 		});
-		const detailsButton = new Discord.MessageButton({
+		const detailsButton = new Discord.ButtonBuilder({
 			customId: `${constants.status.detailsButtonId} ${printerID} ${
 				detailed ? 0 : 1
 			}`,
@@ -33,7 +33,7 @@ module.exports = {
 				: constants.status.showButtonText,
 			style: 'SECONDARY'
 		});
-		const cancelButton = new Discord.MessageButton({
+		const cancelButton = new Discord.ButtonBuilder({
 			customId: `${constants.status.cancelButtonId} ${printerID}`,
 			label: constants.status.cancelButtonText,
 			style: 'DANGER',
