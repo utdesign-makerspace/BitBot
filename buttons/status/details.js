@@ -22,7 +22,7 @@ module.exports = {
 		const refreshButton = new Discord.ButtonBuilder({
 			customId: `${constants.status.detailsButtonId} ${printerID} ${args[1]}`,
 			label: constants.status.refreshButtonText,
-			style: 'SECONDARY'
+			style: Discord.ButtonStyle.Secondary
 		});
 		const detailsButton = new Discord.ButtonBuilder({
 			customId: `${constants.status.detailsButtonId} ${printerID} ${
@@ -31,12 +31,12 @@ module.exports = {
 			label: detailed
 				? constants.status.hideButtonText
 				: constants.status.showButtonText,
-			style: 'SECONDARY'
+			style: Discord.ButtonStyle.Secondary
 		});
 		const cancelButton = new Discord.ButtonBuilder({
 			customId: `${constants.status.cancelButtonId} ${printerID}`,
 			label: constants.status.cancelButtonText,
-			style: 'DANGER',
+			style: Discord.ButtonStyle.Danger,
 			disabled: true
 		});
 		// Allow stopping print if officer

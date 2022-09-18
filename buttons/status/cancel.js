@@ -22,7 +22,7 @@ module.exports = {
 		const cancelButton = new Discord.ButtonBuilder({
 			customId: `cancelthecancel ${interaction.id}`,
 			label: 'Stop Cancellation',
-			style: 'DANGER'
+			style: Discord.ButtonStyle.Danger
 		});
 		const buttonRow = new Discord.ActionRowBuilder().addComponents(
 			cancelButton
