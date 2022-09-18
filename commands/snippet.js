@@ -35,7 +35,12 @@ module.exports = {
 		const embed = new EmbedBuilder()
 			.setTitle(result.title)
 			.setDescription(result.body)
-			.setColor('#c1373d');
+			.setColor('#c1373d')
+			.setAuthor({
+				name: 'UTDesign Makerspace',
+				iconURL: 'https://i.imgur.com/lSwBDLb.png',
+				url: 'https://utdmaker.space/'
+			});
 		await interaction.editReply({ embeds: [embed] });
 	}
 };
