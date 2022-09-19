@@ -46,7 +46,7 @@
 		"eslint": "^8.23.1",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-plugin-import": "^2.25.2",
-		"lint-staged": "^11.2.6",
+		"lint-staged": "^13.0.3",
 		"prettier": "^2.4.1",
 		"pretty-quick": "^3.1.1"
 	}
