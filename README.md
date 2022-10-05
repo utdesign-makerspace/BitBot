@@ -1,7 +1,7 @@
 <!-- center image -->
 <p align="center">
     <img src="./docs/images/logo.svg#gh-light-mode-only" height="200px" />
-    <img src="./docs/images/logo.svg#gh-dark-mode-only" style="filter: invert(100%)" height="200px" />
+    <img src="./docs/images/logo_white.svg#gh-dark-mode-only" height="200px" />
 </p>
 <h1 align="center">BitBot</h1>
 <h3 align="center">The official Discord bot for UTDesign Makerspace.</h3>
