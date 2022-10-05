@@ -29,7 +29,7 @@
 		"axios": "^0.24.0",
 		"cron": "^2.1.0",
 		"date-fns": "^2.28.0",
-		"discord-api-types": "^0.24.0",
+		"discord-api-types": "^0.37.11",
 		"discord.js": "^14.3.0",
 		"dotenv": "^16.0.2",
 		"fs-readdir-recursive": "^1.1.0",
