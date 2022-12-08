@@ -6,28 +6,29 @@ const storage = require('node-persist');
 
 const ldapHelper = require('../lib/ldap');
 
-const connection = mariadb.createPool({
-	host: MOODLE_DB_HOST,
-	user: MOODLE_DB_USER,
-	password: MOODLE_DB_PASS,
-	database: MOODLE_DB_NAME,
-	rowsAsArray: true
-});
-
 module.exports = {
 	cron: '0 * * * * *',
 	action: async () => {
 		await storage.init();
 		let newestId = (await storage.getItem('newestId')) || 0;
+		const connection = mariadb.createPool({
+			host: MOODLE_DB_HOST,
+			user: MOODLE_DB_USER,
+			password: MOODLE_DB_PASS,
+			database: MOODLE_DB_NAME,
+			rowsAsArray: true
+		});
+
 		let conn;
 		try {
 			conn = await connection.getConnection();
-			const rows =
-				await conn.query(`SELECT course_completions.id, course.idnumber, user.username
-          FROM course_completions
-          INNER JOIN user ON course_completions.userid=user.id
-          INNER JOIN course ON course.id=course_completions.course
-          WHERE user.username <> "admin" AND course.idnumber <> "" AND course_completions.id > ${newestId};`);
+			const rows = await conn.query(
+				'SELECT course_completions.id, course.idnumber, user.username\n' +
+					'FROM course_completions\n' +
+					'INNER JOIN user ON course_completions.userid=user.id\n' +
+					'INNER JOIN course ON course.id=course_completions.course\n' +
+					`WHERE user.username <> "admin" AND course.idnumber <> "" AND course_completions.id > ${newestId};`
+			);
 			if (rows.length === 0) {
 				//console.log('No new users');
 				return;
