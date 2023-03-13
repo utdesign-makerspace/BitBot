@@ -9,6 +9,9 @@ const ldapHelper = require('../lib/ldap');
 module.exports = {
 	cron: '0 * * * * *',
 	action: async () => {
+		// if env is not production, don't run
+		if (process.env.NODE_ENV !== 'production') return;
+
 		await storage.init();
 		let newestId = (await storage.getItem('newestId')) || 0;
 		const connection = mariadb.createPool({

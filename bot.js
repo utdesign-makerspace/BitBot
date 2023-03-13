@@ -1,3 +1,42 @@
+console.log(
+	`                        @=                        
+               .@+      #=      #*                
+                :#:    :--:    =*                 
+                     +@@@@@@+                     
+                    +@@@@@@@@=                    
+                    +@@@@@@@@=                    
+                     +@@@@@@=                     
+                       -@@-                       
+                     .=*@@*-.                     
+     -#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#:     
+    -@@=.                                .+@@:    
+    =@@                                   .@@-    
+.-=*@@@    @%%%%%%%%%%%%%%%%%%%%%%%%%%%   .@@@#+-.
+#@@@%@@    @*   :.              :.   +%   .@@%%@@*
+#@% =@@    @*  %@*            .%@=   +%   .@@- %@*
+#@% =@@    @* .@@@@.          :@@@@  +%   .@@- %@*
+#@% =@@    @*  =@@=            +@%-  +%   .@@- @@*
+#@@*#@@    #%:                      :%*   .@@#*@@*
+.-+*@@@     =#%@@@@@@@@@@@@@@@@@@@@@#=    .@@%*=: 
+    =@@                                   .@@-    
+    -@@=..................................+@@:    
+     -%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%-     
+        .....@@#++++++++++++++++++#@@:....        
+           =*@@-                  -@@*-           
+        .*@@%@@-#@*======*@# -#%*:-@@%@@*:        
+       +@@#: @@-#@-      -@# %@@@#-@@ :#@@*       
+      #@@:   @@-*%*++++++*%* .=+= -@@   :%@%      
+    :*@@#.   @@-                  -@@    +@@*:    
+  :%@@@@@@+  @@%##################%@@  -@@@@@@%-  
+  #%%+ :%%%- =+++++++++++++++++++++++ .@@@=.+@@@: 
+`
+);
+
+if (process.env.NODE_ENV !== 'production')
+	console.warn(
+		'⚠️ You are not running in production! LDAP sync will not run.\n'
+	);
+
 require('dotenv').config();
 
 const {
@@ -14,6 +53,7 @@ const fs = require('fs');
 const read = require('fs-readdir-recursive');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const mongoose = require('mongoose');
+mongoose.set('strictQuery', true);
 const mqtt = require('mqtt');
 const constants = require('./lib/constants');
 const cron = require('cron');
@@ -64,7 +104,7 @@ fs.readdirSync('./printer_events')
 	});
 
 client.once('ready', async () => {
-	console.log('Ready!');
+	console.log('🟢 Connected to Discord.');
 
 	// Presence system
 	farm.setPresence(client);
@@ -269,14 +309,14 @@ mongoose
 		useUnifiedTopology: true
 	})
 	.then(() => {
-		console.log('Connected to the database.');
+		console.log('🟢 Connected to the database.');
 	})
 	.catch((err) => {
 		console.log(err);
 	});
 
 mqttClient.on('connect', async function () {
-	console.log('MQTT connected.');
+	// console.log('🟢 MQTT connected.');
 
 	const printerArray = Object.keys(constants.printers).map((key) => {
 		const data = constants.printers[key];
@@ -294,7 +334,7 @@ mqttClient.on('connect', async function () {
 		mqttClient.subscribe(`${printer.name.toLowerCase()}/event/PrintDone`);
 	}
 
-	console.log('Subscribed to MQTT events.');
+	console.log('🟢 Subscribed to MQTT events.');
 });
 
 mqttClient.on('message', async function (topic, message) {

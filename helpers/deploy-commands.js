@@ -16,7 +16,7 @@ function deployCommands() {
 
 	(async () => {
 		try {
-			console.log('Started refreshing application (/) guild commands.');
+			// console.log('Started refreshing application (/) guild commands.');
 
 			await rest.put(
 				Routes.applicationGuildCommands(
@@ -26,9 +26,7 @@ function deployCommands() {
 				{ body: commands }
 			);
 
-			console.log(
-				'Successfully reloaded application (/) guild commands.'
-			);
+			console.log('🟢 Reloaded slash commands.');
 		} catch (error) {
 			console.error(error);
 		}

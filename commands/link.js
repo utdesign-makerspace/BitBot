@@ -35,7 +35,7 @@ module.exports = {
 					const button = new Discord.ButtonBuilder()
 						.setLabel('More Information')
 						.setURL('https://wiki.utdmaker.space/en/bitbot')
-						.setStyle('LINK');
+						.setStyle(Discord.ButtonStyle.Link);
 					const buttonRow =
 						new Discord.ActionRowBuilder().addComponents(button);
 
@@ -64,7 +64,7 @@ module.exports = {
 						const button = new Discord.ButtonBuilder()
 							.setLabel('More Information')
 							.setURL('https://wiki.utdmaker.space/en/bitbot')
-							.setStyle('LINK');
+							.setStyle(Discord.ButtonStyle.Link);
 						const buttonRow =
 							new Discord.ActionRowBuilder().addComponents(
 								button

@@ -4,7 +4,7 @@ module.exports = {
 	runOnStart: true,
 	action: async (client) => {
 		const guild = client.guilds.cache.get(process.env.GUILD_ID);
-		console.log(`- Updating calendar for ${guild.name}... -`);
+		// console.log(`- Updating calendar for ${guild.name}... -`);
 		await calendar.updateDiscordEvents(guild);
 	}
 };

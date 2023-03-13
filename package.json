@@ -6,7 +6,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-		"start": "node bot.js",
+		"start": "node --require ./helpers/suppress-warnings.js bot.js",
 		"docker-build": "docker build --pull --rm -f \"Dockerfile\" -t utdmakerspace/bit-bot:latest \".\"",
 		"yolo": "docker push utdmakerspace/bit-bot:latest"
 	},
