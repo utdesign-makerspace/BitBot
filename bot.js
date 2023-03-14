@@ -331,6 +331,7 @@ mqttClient.on('connect', async function () {
 		mqttClient.subscribe(
 			`${printer.name.toLowerCase()}/event/PrintCancelled`
 		);
+		mqttClient.subscribe(`${printer.name.toLowerCase()}/event/PrintPaused`);
 		mqttClient.subscribe(`${printer.name.toLowerCase()}/event/PrintDone`);
 	}
 

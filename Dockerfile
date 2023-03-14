@@ -1,4 +1,4 @@
-FROM node:16.9.0
+FROM --platform=linux/amd64 node:16.9.0
 
 WORKDIR /opt/bitbot
 COPY package.json .
