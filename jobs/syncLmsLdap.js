@@ -28,7 +28,7 @@ module.exports = {
 				console.log(err);
 			});
 			const rows = await conn.query(
-				'SELECT course_completions.id, course.idnumber, user.username\n' +
+				'SELECT course_completions.id, course.idnumber, user.username, course_completions.timecompleted\n' +
 					'FROM course_completions\n' +
 					'INNER JOIN user ON course_completions.userid=user.id\n' +
 					'INNER JOIN course ON course.id=course_completions.course\n' +
@@ -39,8 +39,8 @@ module.exports = {
 				return;
 			}
 			for (let i = 0; i < Math.min(rows.length, 20); i++) {
+				if (rows[i][3] === null) continue;
 				try {
-					//console.log(rows[i]);
 					await ldapHelper
 						.addUserToGroup(rows[i][2], rows[i][1])
 						.catch((err) => {
