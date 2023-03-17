@@ -39,7 +39,8 @@ module.exports = {
 			.setDescription(
 				'You have stopped watching this printer. You will no longer receive a notification once the printer is available.'
 			)
-			.setTimestamp();
+			.setTimestamp()
+			.setColor('#3b88c3');
 		return interaction.editReply({ embeds: [embed] });
 	}
 };

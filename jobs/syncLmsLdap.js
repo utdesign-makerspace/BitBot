@@ -2,13 +2,16 @@ const { MOODLE_DB_HOST, MOODLE_DB_USER, MOODLE_DB_PASS, MOODLE_DB_NAME } =
 	process.env;
 
 const mariadb = require('mariadb');
-const connection = mariadb.createPool({
-	host: MOODLE_DB_HOST,
-	user: MOODLE_DB_USER,
-	password: MOODLE_DB_PASS,
-	database: MOODLE_DB_NAME,
-	rowsAsArray: true
-});
+const connection =
+	process.env.NODE_ENV == 'production'
+		? mariadb.createPool({
+				host: MOODLE_DB_HOST,
+				user: MOODLE_DB_USER,
+				password: MOODLE_DB_PASS,
+				database: MOODLE_DB_NAME,
+				rowsAsArray: true
+		  })
+		: null;
 const storage = require('node-persist');
 
 const ldapHelper = require('../lib/ldap');

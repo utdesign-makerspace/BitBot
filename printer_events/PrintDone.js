@@ -23,7 +23,8 @@ module.exports = {
 							Date.now() / 1000
 						)}:R>! Please come to the UTDesign Makerspace to pick up your print as soon as possible.`
 					)
-					.setTimestamp();
+					.setTimestamp()
+					.setColor('#78b159');
 
 				// Add image to embed.
 				let snapshot;

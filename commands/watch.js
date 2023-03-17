@@ -32,7 +32,8 @@ module.exports = {
 				.setDescription(
 					'You are already watching a printer. Please use /unwatch to stop watching another printer.'
 				)
-				.setTimestamp();
+				.setTimestamp()
+				.setColor('#dd2e44');
 			return interaction.editReply({ embeds: [embed] });
 		}
 
@@ -44,7 +45,8 @@ module.exports = {
 				.setDescription(
 					'This printer is already being watched by another member. To help with availability, all printers are limited to one watcher.'
 				)
-				.setTimestamp();
+				.setTimestamp()
+				.setColor('#dd2e44');
 			return interaction.editReply({ embeds: [embed] });
 		}
 
@@ -61,7 +63,8 @@ module.exports = {
 				.setDescription(
 					'This printer is currently unavailable to be watched. It may be offline or under maintenance. Please use /status for more information.'
 				)
-				.setTimestamp();
+				.setTimestamp()
+				.setColor('#dd2e44');
 			return interaction.editReply({ embeds: [embed] });
 		} else if (
 			constants.states.get(printerData.state.toLowerCase()) == 'available'
@@ -71,7 +74,8 @@ module.exports = {
 				.setDescription(
 					'This printer is currently available. Please note that this message does not guarantee availability once you arrive.'
 				)
-				.setTimestamp();
+				.setTimestamp()
+				.setColor('#78b159');
 			return interaction.editReply({ embeds: [embed] });
 		}
 
@@ -83,7 +87,8 @@ module.exports = {
 			.setDescription(
 				'You have begun watching this printer. Please make sure that you allow direct messages from server members to receive your notification.'
 			)
-			.setTimestamp();
+			.setTimestamp()
+			.setColor('#3b88c3');
 		return interaction.editReply({ embeds: [embed] });
 	}
 };

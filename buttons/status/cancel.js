@@ -18,7 +18,8 @@ module.exports = {
 			.setDescription(
 				'You have selected to cancel this print. This process is irreversible and your print progress will be lost. You have 30 seconds to change your mind.'
 			)
-			.setImage('attachment://snapshot.jpg');
+			.setImage('attachment://snapshot.jpg')
+			.setColor('#fdcb58');
 		const cancelButton = new Discord.ButtonBuilder({
 			customId: `cancelthecancel ${interaction.id}`,
 			label: 'Stop Cancellation',
@@ -39,13 +40,15 @@ module.exports = {
 			.setDescription(
 				'You have selected to stop your cancellation. Your print will continue as intended.'
 			)
-			.setImage('attachment://snapshot.jpg');
+			.setImage('attachment://snapshot.jpg')
+			.setColor('#78b159');
 		cancelledJobEmbed
 			.setTitle('🛑 Print Cancelled')
 			.setDescription(
 				'Your print has been cancelled. Please come to the Makerspace to retrieve your print.'
 			)
-			.setImage('attachment://snapshot.jpg');
+			.setImage('attachment://snapshot.jpg')
+			.setColor('#dd2e44');
 
 		// Use button collector to determine if user stopped
 		const buttonCollector = msg.createMessageComponentCollector({

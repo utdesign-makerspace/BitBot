@@ -20,7 +20,8 @@ module.exports = {
 							Date.now() / 1000
 						)}:R>. This can happen for a variety of reasons, such as spaghetti being detected or your print violating our rules. Please come to the UTDesign Makerspace to clean up the printer as soon as possible.`
 					)
-					.setTimestamp();
+					.setTimestamp()
+					.setColor('#dd2e44');
 
 				// Add image to embed.
 				const snapshotBuffer = await printers.getSnapshotBuffer(
