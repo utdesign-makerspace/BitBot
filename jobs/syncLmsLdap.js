@@ -22,7 +22,10 @@ module.exports = {
 		// if env is not production, don't run
 		if (process.env.NODE_ENV !== 'production') return;
 
-		await storage.init();
+		await storage.init({
+			writeQueue: true,
+			ttl: 5 * 60 * 1000 // WIll expire in 5 minutes
+		});
 		let latestCompletion = (await storage.getItem('latestCompletion')) || 0;
 
 		let conn;
