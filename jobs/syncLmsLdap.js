@@ -23,8 +23,7 @@ module.exports = {
 		if (process.env.NODE_ENV !== 'production') return;
 
 		await storage.init({
-			writeQueue: true,
-			ttl: 5 * 60 * 1000 // WIll expire in 5 minutes
+			writeQueue: true
 		});
 		let latestCompletion = (await storage.getItem('latestCompletion')) || 0;
 
