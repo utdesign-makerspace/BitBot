@@ -7,6 +7,11 @@ module.exports = {
 		.setDescription(
 			"View a user's UTDesign Makerspace profile if they have linked their Discord account."
 		)
+		.addStringOption((option) =>
+			option
+				.setName('netid')
+				.setDescription('The NetID of the user to view the profile of')
+		)
 		.addUserOption((option) =>
 			option
 				.setName('user')
