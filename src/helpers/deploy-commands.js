@@ -4,7 +4,7 @@ const { Routes } = require('discord-api-types/v9');
 
 function deployCommands() {
 	const commands = fs
-		.readdirSync('./commands/')
+		.readdirSync('./src/commands/')
 		.filter((file) => file.endsWith('.js'))
 		.map((file) => {
 			const command = require(`../commands/${file}`);

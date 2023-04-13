@@ -61,6 +61,7 @@ const Sentry = require('@sentry/node');
 const farm = require('./lib/farm');
 require('./helpers/deploy-commands')();
 const snippetModel = require('./lib/models/snippetSchema');
+import * as Discord from 'discord.js';
 
 if (
 	process.env.NODE_ENV === 'production' &&
@@ -80,25 +81,25 @@ const mqttClient = mqtt.connect(MQTT_HOST, {
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const jobs = [];
 client.commands = new Collection();
-fs.readdirSync('./commands')
-	.filter((file) => file.endsWith('.js'))
-	.forEach((file) => {
+fs.readdirSync('./src/commands')
+	.filter((file: string) => file.endsWith('.js'))
+	.forEach((file: string) => {
 		const command = require(`./commands/${file}`);
 		client.commands.set(command.data.name, command);
 	});
 
 client.buttons = new Collection();
-read('./buttons')
-	.filter((file) => file.endsWith('.js'))
-	.forEach((file) => {
+read('./src/buttons')
+	.filter((file: string) => file.endsWith('.js'))
+	.forEach((file: string) => {
 		const button = require(`./buttons/${file}`);
 		client.buttons.set(button.id, button);
 	});
 
 client.printerEvents = new Collection();
-fs.readdirSync('./printer_events')
-	.filter((file) => file.endsWith('.js'))
-	.forEach((file) => {
+fs.readdirSync('./src/printer_events')
+	.filter((file: string) => file.endsWith('.js'))
+	.forEach((file: string) => {
 		const printerEvent = require(`./printer_events/${file}`);
 		client.printerEvents.set(printerEvent.name, printerEvent);
 	});
@@ -113,9 +114,9 @@ client.once('ready', async () => {
 	}, 5 * 60 * 1000);
 
 	// Cron job system
-	fs.readdirSync('./jobs')
-		.filter((file) => file.endsWith('.js'))
-		.forEach(async (file) => {
+	fs.readdirSync('./src/jobs')
+		.filter((file: string) => file.endsWith('.js'))
+		.forEach(async (file: string) => {
 			const job = require(`./jobs/${file}`);
 			// Set a new item in the Collection
 			// With the key as the command name and the value as the exported module
@@ -133,7 +134,7 @@ client.once('ready', async () => {
 				},
 				null,
 				true,
-				'America/Los_Angeles'
+				'America/Chicago'
 			);
 			cronJob.start();
 			jobs.push(cronJob);
@@ -167,7 +168,7 @@ client.once('ready', async () => {
 	// });
 });
 
-client.on('interactionCreate', async (interaction) => {
+client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 	if (interaction.isButton()) {
 		let args = interaction.customId.split(' ');
 		let id = args.shift();
@@ -198,7 +199,7 @@ client.on('interactionCreate', async (interaction) => {
 			});
 
 			await interaction.respond(
-				filteredOptions.map((choice) => ({
+				filteredOptions.map((choice: any) => ({
 					name: choice.title,
 					value: choice.title
 				}))
@@ -206,68 +207,67 @@ client.on('interactionCreate', async (interaction) => {
 		}
 	}
 
-	if (interaction.customId === 'addSnippet') {
-		// create a new snippet in the database
-		let snip;
-		try {
-			snip = await snippetModel.findOne({
-				title: interaction.fields.getTextInputValue('title')
-			});
+	// check if interaction is a button and has an embed
+	if (interaction.isModalSubmit()) {
+		if (interaction.customId === 'addSnippet') {
+			// create a new snippet in the database
+			let snip;
+			try {
+				snip = await snippetModel.findOne({
+					title: interaction.fields.getTextInputValue('title')
+				});
 
-			if (!snip) {
-				let snipData = {
-					title: interaction.fields.getTextInputValue('title'),
-					body: interaction.fields.getTextInputValue('body')
-				};
-				snip = await snippetModel.create(snipData);
+				if (!snip) {
+					let snipData = {
+						title: interaction.fields.getTextInputValue('title'),
+						body: interaction.fields.getTextInputValue('body')
+					};
+					snip = await snippetModel.create(snipData);
+					await snip.save();
+					await interaction.reply({
+						content: `Snippet "${snip.title}" created!`,
+						ephemeral: true
+					});
+					return;
+				}
+
+				await interaction.reply({
+					content: 'A snippet with that name already exists.',
+					ephemeral: true
+				});
+				return;
+			} catch (err) {
+				console.log(err);
+				return;
+			}
+		} else if (interaction.customId.startsWith('editSnippet')) {
+			// edit a snippet in the database
+			let snip;
+			try {
+				snip = await snippetModel.findOne({
+					_id: interaction.customId.substring(12)
+				});
+
+				if (!snip) {
+					await interaction.reply({
+						content: 'That snippet does not exist.',
+						ephemeral: true
+					});
+					return;
+				}
+
+				snip.title = interaction.fields.getTextInputValue('title');
+				snip.body = interaction.fields.getTextInputValue('body');
 				await snip.save();
 				await interaction.reply({
-					content: `Snippet "${snip.title}" created!`,
+					content: `Snippet "${snip.title}" edited!`,
 					ephemeral: true
 				});
 				return;
-			}
-
-			await interaction.reply({
-				content: 'A snippet with that name already exists.',
-				ephemeral: true
-			});
-			return;
-		} catch (err) {
-			console.log(err);
-			return;
-		}
-	}
-	if (
-		interaction.customId &&
-		interaction.customId.startsWith('editSnippet')
-	) {
-		// edit a snippet in the database
-		let snip;
-		try {
-			snip = await snippetModel.findOne({
-				_id: interaction.customId.substring(12)
-			});
-
-			if (!snip) {
-				await interaction.reply({
-					content: 'That snippet does not exist.',
-					ephemeral: true
-				});
+			} catch (err) {
+				console.log(err);
 				return;
 			}
-
-			snip.title = interaction.fields.getTextInputValue('title');
-			snip.body = interaction.fields.getTextInputValue('body');
-			await snip.save();
-			await interaction.reply({
-				content: `Snippet "${snip.title}" edited!`,
-				ephemeral: true
-			});
-			return;
-		} catch (err) {
-			console.log(err);
-			return;
 		}
 	}
 
@@ -295,8 +295,7 @@ client.on('interactionCreate', async (interaction) => {
 			Sentry.captureException(error);
 		}
 		await interaction.editReply({
-			content: 'There was an error while executing this command!',
-			ephemeral: true
+			content: 'There was an error while executing this command!'
 		});
 	}
 });
@@ -311,7 +310,7 @@ mongoose
 	.then(() => {
 		console.log('🟢 Connected to the database.');
 	})
-	.catch((err) => {
+	.catch((err: any) => {
 		console.log(err);
 	});
 
@@ -338,12 +337,13 @@ mqttClient.on('connect', async function () {
 	console.log('🟢 Subscribed to MQTT events.');
 });
 
-mqttClient.on('message', async function (topic, message) {
+mqttClient.on('message', async function (topic: string, message: string) {
 	const data = JSON.parse(message.toString());
 
 	// If the timestamp of the event is older than five seconds, ignore it
 	const now = new Date();
-	if (now - new Date(data._timestamp * 1000) > 5000) return;
+	if (now.getTime() - new Date(data._timestamp * 1000).getTime() > 5000)
+		return;
 
 	// Grab the printer name
 	const printerId = topic.split('/')[0];
