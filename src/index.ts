@@ -39,26 +39,19 @@ if (process.env.NODE_ENV !== 'production')
 
 require('dotenv').config();
 
-const {
-	DISCORD_TOKEN,
-	MONGODB_SRV,
-	MQTT_HOST,
-	MQTT_USER,
-	MQTT_PASS,
-	OFFICER_ID,
-	GUILD_ID
-} = process.env;
+const { DISCORD_TOKEN, MONGODB_SRV, MQTT_HOST, MQTT_USER, MQTT_PASS } =
+	process.env;
 
-const fs = require('fs');
-const read = require('fs-readdir-recursive');
-const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const mongoose = require('mongoose');
+import fs = require('fs');
+import read = require('fs-readdir-recursive');
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
+import mongoose = require('mongoose');
 mongoose.set('strictQuery', true);
-const mqtt = require('mqtt');
-const constants = require('./lib/constants');
-const cron = require('cron');
-const Sentry = require('@sentry/node');
-const farm = require('./lib/farm');
+import mqtt = require('mqtt');
+import constants = require('./lib/constants');
+import cron = require('cron');
+import Sentry = require('@sentry/node');
+import farm = require('./lib/farm');
 require('./helpers/deploy-commands')();
 import snippetModel = require('./lib/models/snippetSchema');
 import * as Discord from 'discord.js';
@@ -73,35 +66,35 @@ if (
 	});
 }
 
-const mqttClient = mqtt.connect(MQTT_HOST, {
+const mqttClient = mqtt.connect(MQTT_HOST ?? 'mqtt://localhost', {
 	username: MQTT_USER,
 	password: MQTT_PASS
 });
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const jobs = [];
-client.commands = new Collection();
+const commands = new Collection<string, any>();
 fs.readdirSync('./src/commands')
 	.filter((file: string) => file.endsWith('.ts'))
 	.forEach((file: string) => {
 		const command = require(`./commands/${file}`);
-		client.commands.set(command.data.name, command);
+		commands.set(command.data.name, command);
 	});
 
-client.buttons = new Collection();
+const buttons = new Collection<string, any>();
 read('./src/buttons')
 	.filter((file: string) => file.endsWith('.ts'))
 	.forEach((file: string) => {
 		const button = require(`./buttons/${file}`);
-		client.buttons.set(button.id, button);
+		buttons.set(button.id, button);
 	});
 
-client.printerEvents = new Collection();
+const printerEvents = new Collection<string, any>();
 fs.readdirSync('./src/printer_events')
 	.filter((file: string) => file.endsWith('.ts'))
 	.forEach((file: string) => {
 		const printerEvent = require(`./printer_events/${file}`);
-		client.printerEvents.set(printerEvent.name, printerEvent);
+		printerEvents.set(printerEvent.name, printerEvent);
 	});
 
 client.once('ready', async () => {
@@ -173,7 +166,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 		let args = interaction.customId.split(' ');
 		let id = args.shift();
 
-		const button = client.buttons.get(id);
+		const button = buttons.get(id ?? '');
 
 		if (!button) return;
 
@@ -278,7 +271,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 	)
 		return;
 
-	const command = client.commands.get(interaction.commandName);
+	const command = commands.get(interaction.commandName);
 
 	if (!command) return;
 
@@ -303,10 +296,10 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 client.login(DISCORD_TOKEN);
 
 mongoose
-	.connect(MONGODB_SRV, {
+	.connect(MONGODB_SRV ?? 'mongodb://localhost:27017/', {
 		useNewUrlParser: true,
 		useUnifiedTopology: true
-	})
+	} as mongoose.ConnectOptions)
 	.then(() => {
 		console.log('🟢 Connected to the database.');
 	})
@@ -319,7 +312,7 @@ mqttClient.on('connect', async function () {
 
 	const printerArray = Object.keys(constants.printers).map((key) => {
 		const data = constants.printers[key];
-		data.lookup = key;
+		data.key = key;
 		return data;
 	});
 	for (let i = 0; i < printerArray.length; i++) {
@@ -349,7 +342,7 @@ mqttClient.on('message', async function (topic: string, message: string) {
 	const printerId = topic.split('/')[0];
 
 	// Run the printer event
-	const event = client.printerEvents.get(data._event);
+	const event = printerEvents.get(data._event);
 
 	if (!event) return;
 
