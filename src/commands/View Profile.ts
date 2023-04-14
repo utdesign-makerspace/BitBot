@@ -1,4 +1,5 @@
-const profile = require('../lib/profiles');
+import * as Discord from 'discord.js';
+import profile = require('../lib/profiles');
 
 module.exports = {
 	data: {
@@ -7,7 +8,7 @@ module.exports = {
 	},
 	ephemeral: true,
 	context: true,
-	async execute(interaction) {
+	async execute(interaction: Discord.Interaction) {
 		profile.displayProfile(interaction);
 	}
 };

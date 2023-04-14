@@ -1,8 +1,8 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js');
-const constants = require('../lib/constants');
-const printers = require('../lib/printers');
-const printerModel = require('../lib/models/printerSchema');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import constants = require('../lib/constants');
+import printers = require('../lib/printers');
+import printerModel = require('../lib/models/printerSchema');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -18,13 +18,13 @@ module.exports = {
 				.setRequired(true)
 		),
 	ephemeral: true,
-	async execute(interaction) {
-		const printerID = interaction.options.getString('printer');
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
+		const printerID = interaction.options.getString('printer', true);
 		const embed = await printers.getEmbedTemplate(printerID);
 
 		// See if the user is already watching a printer
-		const watchedByUser = await printerModel.find({
-			watcher: interaction.member.id
+		const watchedByUser = await printerModel.Printer.find({
+			watcher: (interaction.member as Discord.GuildMember).id
 		});
 		if (watchedByUser.length > 0) {
 			embed
@@ -39,6 +39,10 @@ module.exports = {
 
 		// See if the printer is already being watched
 		const printer = await printers.getPrinterFromDb(printerID);
+		if (!printer)
+			return interaction.editReply({
+				content: 'Printer not found. Please try again.'
+			});
 		if (printer.watcher) {
 			embed
 				.setTitle('🙈  Printer Already Watched')
@@ -51,7 +55,7 @@ module.exports = {
 		}
 
 		// See if the printer is unavailable/available
-		printerData = await printers.getJob(printerID);
+		let printerData = await printers.getJob(printerID);
 		if (
 			!printerData ||
 			constants.states.get(printerData.state.toLowerCase()) ==
@@ -80,7 +84,7 @@ module.exports = {
 		}
 
 		// We're good to go, watch the printer
-		printer.watcher = interaction.member.id;
+		printer.watcher = (interaction.member as Discord.GuildMember).id;
 		printer.save();
 		embed
 			.setTitle('👀  Watching Printer')

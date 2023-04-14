@@ -1,24 +1,23 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js');
-const constants = require('../lib/constants');
-const printers = require('../lib/printers');
-const printerModel = require('../lib/models/printerSchema');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import printers = require('../lib/printers');
+import printerModel = require('../lib/models/printerSchema');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('unwatch')
 		.setDescription('Stop watching a 3D printer.'),
 	ephemeral: true,
-	async execute(interaction) {
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		let printerID = null;
 
 		// See if the user is already watching a printer
-		const watchedByUser = await printerModel.find({
-			watcher: interaction.member.id
+		const watchedByUser = await printerModel.Printer.find({
+			watcher: (interaction.member as Discord.GuildMember).id
 		});
 		watchedByUser.forEach(async (printer) => {
 			printerID = printer.id;
-			printer.watcher = null;
+			printer.watcher = undefined;
 			await printer.save();
 		});
 

@@ -1,11 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const {
-	ActionRowBuilder,
-	ModalBuilder,
-	TextInputBuilder,
-	TextInputStyle
-} = require('discord.js');
-const snippetModel = require('../lib/models/snippetSchema');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import snippetModel = require('../lib/models/snippetSchema');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -40,29 +35,35 @@ module.exports = {
 				)
 		),
 	noDefer: true,
-	async execute(interaction) {
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		if (interaction.options.getSubcommand() === 'add') {
 			// create a modal
-			const modal = new ModalBuilder()
+			const modal = new Discord.ModalBuilder()
 				.setCustomId('addSnippet')
 				.setTitle('Add Snippet');
 
 			// create text inputs
-			const titleInput = new TextInputBuilder()
+			const titleInput = new Discord.TextInputBuilder()
 				.setCustomId('title')
 				.setLabel('Title')
 				.setPlaceholder('Hours of Operation')
-				.setStyle(TextInputStyle.Short);
-			const bodyInput = new TextInputBuilder()
+				.setStyle(Discord.TextInputStyle.Short);
+			const bodyInput = new Discord.TextInputBuilder()
 				.setCustomId('body')
 				.setLabel('Body')
 				.setPlaceholder(
 					'Our hours of operation are from 7 AM to 9 PM on weekdays.'
 				)
-				.setStyle(TextInputStyle.Paragraph);
+				.setStyle(Discord.TextInputStyle.Paragraph);
 
-			const titleRow = new ActionRowBuilder().addComponents(titleInput);
-			const bodyRow = new ActionRowBuilder().addComponents(bodyInput);
+			const titleRow =
+				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+					titleInput
+				);
+			const bodyRow =
+				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+					bodyInput
+				);
 
 			modal.addComponents(titleRow, bodyRow);
 
@@ -72,7 +73,9 @@ module.exports = {
 			const snippet = interaction.options.getString('snippet');
 
 			// get the snippet from the database
-			const result = await snippetModel.findOne({ title: snippet });
+			const result = await snippetModel.Snippet.findOne({
+				title: snippet
+			});
 
 			// if the snippet doesn't exist, return
 			if (!result) {
@@ -84,7 +87,7 @@ module.exports = {
 			}
 
 			// if the snippet exists, delete it
-			await snippetModel.deleteOne({ title: snippet });
+			await snippetModel.Snippet.deleteOne({ title: snippet });
 
 			await interaction.reply({
 				content: `The snippet "${snippet}" has been deleted.`,
@@ -95,7 +98,9 @@ module.exports = {
 			const snippet = interaction.options.getString('snippet');
 
 			// get the snippet from the database
-			const result = await snippetModel.findOne({ title: snippet });
+			const result = await snippetModel.Snippet.findOne({
+				title: snippet
+			});
 
 			// if the snippet doesn't exist, return
 			if (!result) {
@@ -107,24 +112,30 @@ module.exports = {
 			}
 
 			// create a modal
-			const modal = new ModalBuilder()
+			const modal = new Discord.ModalBuilder()
 				.setCustomId(`editSnippet-${result._id}`)
 				.setTitle(`Edit ${result.title}`);
 
 			// create text inputs
-			const titleInput = new TextInputBuilder()
+			const titleInput = new Discord.TextInputBuilder()
 				.setCustomId('title')
 				.setLabel('Title')
 				.setValue(result.title)
-				.setStyle(TextInputStyle.Short);
-			const bodyInput = new TextInputBuilder()
+				.setStyle(Discord.TextInputStyle.Short);
+			const bodyInput = new Discord.TextInputBuilder()
 				.setCustomId('body')
 				.setLabel('Body')
 				.setValue(result.body)
-				.setStyle(TextInputStyle.Paragraph);
+				.setStyle(Discord.TextInputStyle.Paragraph);
 
-			const titleRow = new ActionRowBuilder().addComponents(titleInput);
-			const bodyRow = new ActionRowBuilder().addComponents(bodyInput);
+			const titleRow =
+				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+					titleInput
+				);
+			const bodyRow =
+				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+					bodyInput
+				);
 
 			modal.addComponents(titleRow, bodyRow);
 

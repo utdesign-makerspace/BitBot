@@ -1,5 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder } = require('discord.js');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import snippetModel = require('../lib/models/snippetSchema');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -14,25 +15,23 @@ module.exports = {
 				.setRequired(true)
 				.setAutocomplete(true)
 		),
-	async execute(interaction) {
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		// get the snippet option
 		const snippet = interaction.options.getString('snippet');
 
 		// get the snippet from the database
-		const snippetModel = require('../lib/models/snippetSchema');
-		const result = await snippetModel.findOne({ title: snippet });
+		const result = await snippetModel.Snippet.findOne({ title: snippet });
 
 		// if the snippet doesn't exist, return
 		if (!result) {
 			await interaction.editReply({
-				content: `The snippet "${snippet}" does not exist.`,
-				ephemeral: true
+				content: `The snippet "${snippet}" does not exist.`
 			});
 			return;
 		}
 
 		// if the snippet exists, send an embed
-		const embed = new EmbedBuilder()
+		const embed = new Discord.EmbedBuilder()
 			.setTitle(result.title)
 			.setDescription(result.body)
 			.setColor('#c1373d')

@@ -1,5 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const profiles = require('../lib/profiles');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import profiles = require('../lib/profiles');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -18,7 +19,7 @@ module.exports = {
 				.setDescription('The user to view the profile of')
 		),
 	ephemeral: true,
-	execute: async (interaction) => {
+	execute: async (interaction: Discord.ChatInputCommandInteraction) => {
 		profiles.displayProfile(interaction);
 	}
 };

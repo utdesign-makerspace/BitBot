@@ -1,6 +1,7 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const constants = require('../lib/constants');
-const printers = require('../lib/printers');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import constants = require('../lib/constants');
+import printers = require('../lib/printers');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,23 +23,24 @@ module.exports = {
 				.setDescription('Reason for maintenance mode if enabled')
 		),
 	ephemeral: true,
-	async execute(interaction) {
-		const printerID = interaction.options.getString('printer');
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
+		const printerID = interaction.options.getString('printer', true);
 		const reason = interaction.options.getString('reason');
 
-		const success = await printers.setMaintenance(printerID, reason);
+		const success = await printers.setMaintenance(
+			printerID,
+			reason ?? undefined
+		);
 
 		if (success)
 			await interaction.editReply({
 				content: reason
 					? 'Enabled maintenance mode.'
-					: 'Disabled maintenance mode.',
-				ephemeral: true
+					: 'Disabled maintenance mode.'
 			});
 		else
 			await interaction.editReply({
-				content: 'Failed to set maintenance mode.',
-				ephemeral: true
+				content: 'Failed to set maintenance mode.'
 			});
 	}
 };

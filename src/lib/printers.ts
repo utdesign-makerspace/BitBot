@@ -314,7 +314,7 @@ export async function cancelJob(printerID: string): Promise<PrinterJob | null> {
 
 export async function getPrinterFromDb(
 	printerID: string
-): Promise<printerSchema.IPrinter | null> {
+): Promise<printerSchema.IPrinter | undefined> {
 	let printer;
 	try {
 		printer = await printerSchema.Printer.findOne({ id: printerID });
@@ -330,13 +330,13 @@ export async function getPrinterFromDb(
 		} else return printer;
 	} catch (err) {
 		console.log(err);
-		return null;
+		return;
 	}
 }
 
 export async function setMaintenance(
 	printerID: string,
-	reason: string
+	reason?: string
 ): Promise<boolean> {
 	// Get printer from db
 	let printer = await this.getPrinterFromDb(printerID);

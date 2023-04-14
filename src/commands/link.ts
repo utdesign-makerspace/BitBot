@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js');
-const ldap = require('../lib/ldap');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import ldap = require('../lib/ldap');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -15,7 +15,7 @@ module.exports = {
 				.setRequired(true)
 		),
 	ephemeral: true,
-	execute: async (interaction) => {
+	execute: async (interaction: Discord.ChatInputCommandInteraction) => {
 		const embed = new Discord.EmbedBuilder()
 			.setAuthor({
 				name: 'UTDesign Makerspace',
@@ -37,14 +37,16 @@ module.exports = {
 						.setURL('https://wiki.utdmaker.space/en/bitbot')
 						.setStyle(Discord.ButtonStyle.Link);
 					const buttonRow =
-						new Discord.ActionRowBuilder().addComponents(button);
+						new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
+							button
+						);
 
 					interaction.editReply({
 						embeds: [embed],
 						components: [buttonRow]
 					});
 				} else {
-					const netid = interaction.options.getString('netid');
+					const netid = interaction.options.getString('netid', true);
 					ldap.getUserByUsername(netid).then((netidUser) => {
 						if (netidUser) {
 							ldap.linkUserToDiscord(netid, interaction.user.id);
@@ -66,7 +68,7 @@ module.exports = {
 							.setURL('https://wiki.utdmaker.space/en/bitbot')
 							.setStyle(Discord.ButtonStyle.Link);
 						const buttonRow =
-							new Discord.ActionRowBuilder().addComponents(
+							new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
 								button
 							);
 

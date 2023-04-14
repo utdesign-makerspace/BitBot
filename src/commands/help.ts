@@ -1,12 +1,12 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('help')
 		.setDescription('Gives information about the bot.'),
 	ephemeral: true,
-	async execute(interaction) {
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		const helpEmbed = new Discord.EmbedBuilder()
 			.setColor('#c1393d')
 			.setAuthor({
@@ -23,6 +23,6 @@ module.exports = {
 				name: '3D Printing',
 				value: 'Check the status of printers at any time using /status. Link your Discord and UTDesign Makerspace accounts using /link to receive notifications for your 3D prints.'
 			});
-		interaction.editReply({ embeds: [helpEmbed], ephemeral: true });
+		interaction.editReply({ embeds: [helpEmbed] });
 	}
 };

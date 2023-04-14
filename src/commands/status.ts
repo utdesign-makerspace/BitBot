@@ -1,8 +1,8 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const Discord = require('discord.js');
-const constants = require('../lib/constants');
-const printers = require('../lib/printers');
-const farm = require('../lib/farm');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import * as Discord from 'discord.js';
+import constants = require('../lib/constants');
+import printers = require('../lib/printers');
+import farm = require('../lib/farm');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -15,7 +15,7 @@ module.exports = {
 				.addChoices(constants.printerChoices)
 		),
 	ephemeral: true,
-	async execute(interaction) {
+	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		const printerID = interaction.options.getString('printer');
 
 		let msg;
@@ -42,15 +42,16 @@ module.exports = {
 			});
 			// Allow stopping print if officer
 			if (
-				interaction.member.roles.cache.some(
-					(role) => role.name === constants.officerRoleName
-				)
+				(
+					interaction.member?.roles as Discord.GuildMemberRoleManager
+				).cache.some((role) => role.name === constants.officerRoleName)
 			)
 				cancelButton.setDisabled(false);
-			const buttonRow = new Discord.ActionRowBuilder().addComponents(
-				refreshButton,
-				viewButton
-			);
+			const buttonRow =
+				new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
+					refreshButton,
+					viewButton
+				);
 			// Only add view and cancel buttons if printer in use
 			const data = await printers.getJob(printerID);
 			if (data && (data.state == 'Printing' || data.state == 'Paused'))
