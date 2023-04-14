@@ -36,36 +36,46 @@ module.exports = {
 		),
 	noDefer: true,
 	async execute(interaction: Discord.ChatInputCommandInteraction) {
+		const titleInput = new Discord.TextInputBuilder()
+			.setCustomId('title')
+			.setLabel('Title')
+			.setPlaceholder('Hours of Operation')
+			.setStyle(Discord.TextInputStyle.Short);
+		const bodyInput = new Discord.TextInputBuilder()
+			.setCustomId('body')
+			.setLabel('Body')
+			.setPlaceholder(
+				'Our hours of operation are from 7 AM to 9 PM on weekdays.'
+			)
+			.setStyle(Discord.TextInputStyle.Paragraph);
+		const triggersInput = new Discord.TextInputBuilder()
+			.setCustomId('triggers')
+			.setLabel('Triggers')
+			.setPlaceholder(
+				'Use * to indicate a wildcard.\nwhen*makerspace close\nwhen*makerspace open\nhours*makerspace'
+			)
+			.setStyle(Discord.TextInputStyle.Paragraph);
+
+		const titleRow =
+			new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+				titleInput
+			);
+		const bodyRow =
+			new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+				bodyInput
+			);
+		const triggersRow =
+			new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
+				triggersInput
+			);
+
 		if (interaction.options.getSubcommand() === 'add') {
 			// create a modal
 			const modal = new Discord.ModalBuilder()
 				.setCustomId('addSnippet')
 				.setTitle('Add Snippet');
 
-			// create text inputs
-			const titleInput = new Discord.TextInputBuilder()
-				.setCustomId('title')
-				.setLabel('Title')
-				.setPlaceholder('Hours of Operation')
-				.setStyle(Discord.TextInputStyle.Short);
-			const bodyInput = new Discord.TextInputBuilder()
-				.setCustomId('body')
-				.setLabel('Body')
-				.setPlaceholder(
-					'Our hours of operation are from 7 AM to 9 PM on weekdays.'
-				)
-				.setStyle(Discord.TextInputStyle.Paragraph);
-
-			const titleRow =
-				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
-					titleInput
-				);
-			const bodyRow =
-				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
-					bodyInput
-				);
-
-			modal.addComponents(titleRow, bodyRow);
+			modal.addComponents(titleRow, bodyRow, triggersRow);
 
 			await interaction.showModal(modal);
 		} else if (interaction.options.getSubcommand() === 'remove') {
@@ -111,33 +121,17 @@ module.exports = {
 				return;
 			}
 
+			// set current values
+			titleInput.setValue(result.title);
+			bodyInput.setValue(result.body);
+			triggersInput.setValue(result.triggers.join('\n'));
+
 			// create a modal
 			const modal = new Discord.ModalBuilder()
 				.setCustomId(`editSnippet-${result._id}`)
 				.setTitle(`Edit ${result.title}`);
 
-			// create text inputs
-			const titleInput = new Discord.TextInputBuilder()
-				.setCustomId('title')
-				.setLabel('Title')
-				.setValue(result.title)
-				.setStyle(Discord.TextInputStyle.Short);
-			const bodyInput = new Discord.TextInputBuilder()
-				.setCustomId('body')
-				.setLabel('Body')
-				.setValue(result.body)
-				.setStyle(Discord.TextInputStyle.Paragraph);
-
-			const titleRow =
-				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
-					titleInput
-				);
-			const bodyRow =
-				new Discord.ActionRowBuilder<Discord.TextInputBuilder>().addComponents(
-					bodyInput
-				);
-
-			modal.addComponents(titleRow, bodyRow);
+			modal.addComponents(titleRow, bodyRow, triggersRow);
 
 			await interaction.showModal(modal);
 		}

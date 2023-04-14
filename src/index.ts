@@ -71,7 +71,13 @@ const mqttClient = mqtt.connect(MQTT_HOST ?? 'mqtt://localhost', {
 	password: MQTT_PASS
 });
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+	intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.MessageContent
+	]
+});
 const jobs = [];
 const commands = new Collection<string, any>();
 fs.readdirSync('./src/commands')
@@ -96,6 +102,17 @@ fs.readdirSync('./src/printer_events')
 		const printerEvent = require(`./printer_events/${file}`);
 		printerEvents.set(printerEvent.name, printerEvent);
 	});
+
+let snippets = new Collection<string[], any>();
+snippetModel.Snippet.find({}, (err: any, docs: snippetModel.ISnippet[]) => {
+	if (err) {
+		console.error(err);
+		return;
+	}
+	docs.forEach((doc: snippetModel.ISnippet) => {
+		snippets.set(doc.triggers, doc);
+	});
+});
 
 client.once('ready', async () => {
 	console.log('🟢 Connected to Discord.');
@@ -161,6 +178,33 @@ client.once('ready', async () => {
 	// });
 });
 
+client.on('messageCreate', async (message: Discord.Message) => {
+	if (message.author.bot) return;
+
+	snippets.forEach((s) => {
+		s.triggers.forEach((t: string) => {
+			const r = new RegExp(
+				`${t.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace('*', '.*')}`,
+				'igs'
+			);
+			if (message.content.match(r)) {
+				// TODO: Move this to a library
+				const embed = new Discord.EmbedBuilder()
+					.setTitle(s.title)
+					.setDescription(s.body)
+					.setColor('#c1373d')
+					.setAuthor({
+						name: 'UTDesign Makerspace',
+						iconURL: 'https://i.imgur.com/lSwBDLb.png',
+						url: 'https://utdmaker.space/'
+					});
+				message.react('👋');
+				message.channel.send({ embeds: [embed] });
+			}
+		});
+	});
+});
+
 client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 	if (interaction.isButton()) {
 		let args = interaction.customId.split(' ');
@@ -213,7 +257,10 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 				if (!snip) {
 					let snipData = {
 						title: interaction.fields.getTextInputValue('title'),
-						body: interaction.fields.getTextInputValue('body')
+						body: interaction.fields.getTextInputValue('body'),
+						triggers: interaction.fields
+							.getTextInputValue('triggers')
+							.split('\n')
 					};
 					snip = await snippetModel.Snippet.create(snipData);
 					await snip.save();
@@ -251,6 +298,9 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 
 				snip.title = interaction.fields.getTextInputValue('title');
 				snip.body = interaction.fields.getTextInputValue('body');
+				snip.triggers = interaction.fields
+					.getTextInputValue('triggers')
+					.split('\n');
 				await snip.save();
 				await interaction.reply({
 					content: `Snippet "${snip.title}" edited!`,
