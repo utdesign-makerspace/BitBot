@@ -198,8 +198,7 @@ client.on('messageCreate', async (message: Discord.Message) => {
 						iconURL: 'https://i.imgur.com/lSwBDLb.png',
 						url: 'https://utdmaker.space/'
 					});
-				message.react('👋');
-				message.channel.send({ embeds: [embed] });
+				message.reply({ embeds: [embed] });
 			}
 		});
 	});
