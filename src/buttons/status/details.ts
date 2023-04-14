@@ -1,19 +1,16 @@
-const constants = require('../../lib/constants');
-const printers = require('../../lib/printers');
-const Discord = require('discord.js');
+import constants = require('../../lib/constants');
+import printers = require('../../lib/printers');
+import * as Discord from 'discord.js';
 
 module.exports = {
 	id: constants.status.detailsButtonId,
-	async execute(interaction, args) {
+	async execute(interaction: Discord.Interaction, args: string[]) {
+		if (!interaction.isButton()) return;
 		interaction.deferUpdate();
 
 		// Grab our arguments
 		const printerID = args[0];
-		let detailed = args[1];
-
-		// Convert 0 or 1 to false or true
-		if (detailed == true) detailed = true;
-		else detailed = false;
+		let detailed = args[1] == '1' ? true : false;
 
 		// Get the message options for the printer
 		let msg = await printers.getMessage(printerID, detailed);
@@ -41,22 +38,22 @@ module.exports = {
 		});
 		// Allow stopping print if officer
 		if (
-			interaction.member.roles.cache.some(
-				(role) => role.name === constants.officerRoleName
-			)
+			(
+				interaction.member?.roles as Discord.GuildMemberRoleManager
+			).cache.some((role) => role.name === constants.officerRoleName)
 		)
 			cancelButton.setDisabled(false);
-		const buttonRow = new Discord.ActionRowBuilder().addComponents(
-			refreshButton,
-			detailsButton
-		);
+		const buttonRow =
+			new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
+				refreshButton,
+				detailsButton
+			);
 		// Only add view and cancel buttons if printer in use
 		const data = await printers.getJob(printerID);
 		if (data && (data.state == 'Printing' || data.state == 'Paused'))
 			buttonRow.addComponents(cancelButton);
 
 		msg.components = [buttonRow];
-		msg.attachments = []; // This gets rid of previous images to prevent an overflow
 		await interaction.editReply(msg);
 	}
 };

@@ -60,7 +60,7 @@ const cron = require('cron');
 const Sentry = require('@sentry/node');
 const farm = require('./lib/farm');
 require('./helpers/deploy-commands')();
-const snippetModel = require('./lib/models/snippetSchema');
+import snippetModel = require('./lib/models/snippetSchema');
 import * as Discord from 'discord.js';
 
 if (
@@ -82,7 +82,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const jobs = [];
 client.commands = new Collection();
 fs.readdirSync('./src/commands')
-	.filter((file: string) => file.endsWith('.js'))
+	.filter((file: string) => file.endsWith('.ts'))
 	.forEach((file: string) => {
 		const command = require(`./commands/${file}`);
 		client.commands.set(command.data.name, command);
@@ -90,7 +90,7 @@ fs.readdirSync('./src/commands')
 
 client.buttons = new Collection();
 read('./src/buttons')
-	.filter((file: string) => file.endsWith('.js'))
+	.filter((file: string) => file.endsWith('.ts'))
 	.forEach((file: string) => {
 		const button = require(`./buttons/${file}`);
 		client.buttons.set(button.id, button);
@@ -98,7 +98,7 @@ read('./src/buttons')
 
 client.printerEvents = new Collection();
 fs.readdirSync('./src/printer_events')
-	.filter((file: string) => file.endsWith('.js'))
+	.filter((file: string) => file.endsWith('.ts'))
 	.forEach((file: string) => {
 		const printerEvent = require(`./printer_events/${file}`);
 		client.printerEvents.set(printerEvent.name, printerEvent);
@@ -115,7 +115,7 @@ client.once('ready', async () => {
 
 	// Cron job system
 	fs.readdirSync('./src/jobs')
-		.filter((file: string) => file.endsWith('.js'))
+		.filter((file: string) => file.endsWith('.ts'))
 		.forEach(async (file: string) => {
 			const job = require(`./jobs/${file}`);
 			// Set a new item in the Collection
@@ -194,7 +194,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 		) {
 			const focused = interaction.options.getFocused();
 			// create array filteredOptions with all snippets in database that contain user input in lowercase
-			const filteredOptions = await snippetModel.find({
+			const filteredOptions = await snippetModel.Snippet.find({
 				title: { $regex: focused, $options: 'i' }
 			});
 
@@ -213,7 +213,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 			// create a new snippet in the database
 			let snip;
 			try {
-				snip = await snippetModel.findOne({
+				snip = await snippetModel.Snippet.findOne({
 					title: interaction.fields.getTextInputValue('title')
 				});
 
@@ -222,7 +222,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 						title: interaction.fields.getTextInputValue('title'),
 						body: interaction.fields.getTextInputValue('body')
 					};
-					snip = await snippetModel.create(snipData);
+					snip = await snippetModel.Snippet.create(snipData);
 					await snip.save();
 					await interaction.reply({
 						content: `Snippet "${snip.title}" created!`,
@@ -244,7 +244,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 			// edit a snippet in the database
 			let snip;
 			try {
-				snip = await snippetModel.findOne({
+				snip = await snippetModel.Snippet.findOne({
 					_id: interaction.customId.substring(12)
 				});
 

@@ -1,10 +1,11 @@
-const Discord = require('discord.js');
-const constants = require('../../lib/constants');
-const printers = require('../../lib/printers');
+import * as Discord from 'discord.js';
+import constants = require('../../lib/constants');
+import printers = require('../../lib/printers');
 
 module.exports = {
 	id: constants.status.cancelButtonId,
-	async execute(interaction, args) {
+	async execute(interaction: Discord.Interaction, args: string[]) {
+		if (!interaction.isButton()) return;
 		await interaction.deferUpdate();
 
 		// Get embeds to start with
@@ -25,9 +26,10 @@ module.exports = {
 			label: 'Stop Cancellation',
 			style: Discord.ButtonStyle.Danger
 		});
-		const buttonRow = new Discord.ActionRowBuilder().addComponents(
-			cancelButton
-		);
+		const buttonRow =
+			new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
+				cancelButton
+			);
 		// Send warning embed
 		const msg = await interaction.editReply({
 			embeds: [warningEmbed],
@@ -52,12 +54,12 @@ module.exports = {
 
 		// Use button collector to determine if user stopped
 		const buttonCollector = msg.createMessageComponentCollector({
-			componentType: 'BUTTON',
+			componentType: Discord.ComponentType.Button,
 			time: 30 * 1000
 		});
-		buttonCollector.on('collect', (i) => {
+		buttonCollector.on('collect', async (i) => {
 			if (i.customId === `cancelthecancel ${interaction.id}`)
-				return i.update({
+				i.update({
 					embeds: [cancelledCancelEmbed],
 					components: []
 				});
@@ -65,7 +67,7 @@ module.exports = {
 		buttonCollector.on('end', async (collected) => {
 			if (collected.size == 0) {
 				await printers.cancelJob(args[0]);
-				return interaction.editReply({
+				interaction.editReply({
 					embeds: [cancelledJobEmbed],
 					components: []
 				});

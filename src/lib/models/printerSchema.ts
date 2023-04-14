@@ -1,4 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose = require('mongoose');
+
+export interface IPrinter extends mongoose.Document {
+	id: string;
+	underMaintenance: boolean;
+	maintenanceReason?: string;
+	watcher?: string;
+}
 
 const printerSchema = new mongoose.Schema({
 	id: { type: String, require: true, unique: true }, // The ID of the printer, ex. "red"
@@ -7,6 +14,5 @@ const printerSchema = new mongoose.Schema({
 	watcher: { type: String, require: true, default: null } // The ID of the user waiting for the printer
 });
 
-const model = mongoose.model('printers', printerSchema);
-
-module.exports = model;
+export const Printer = mongoose.model<IPrinter>('printers', printerSchema);
+export default Printer;

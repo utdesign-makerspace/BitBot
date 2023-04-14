@@ -1,7 +1,7 @@
 const { MOODLE_DB_HOST, MOODLE_DB_USER, MOODLE_DB_PASS, MOODLE_DB_NAME } =
 	process.env;
 
-const mariadb = require('mariadb');
+import mariadb = require('mariadb');
 const connection =
 	process.env.NODE_ENV == 'production'
 		? mariadb.createPool({
@@ -12,26 +12,28 @@ const connection =
 				rowsAsArray: true
 		  })
 		: null;
-const storage = require('node-persist');
+import storage = require('node-persist');
 
-const ldapHelper = require('../lib/ldap');
+import ldapHelper = require('../lib/ldap');
 
 module.exports = {
 	cron: '0 */15 * * * *',
 	action: async function () {
 		// if env is not production, don't run
-		if (process.env.NODE_ENV !== 'production') return;
+		if (connection == null) return;
 
 		await storage.init({
-			writeQueue: true
+			forgiveParseErrors: true
 		});
 		let latestCompletion = (await storage.getItem('latestCompletion')) || 0;
 
-		let conn;
+		let conn: mariadb.PoolConnection | null;
+		conn = null;
 		try {
-			conn = await connection.getConnection().catch((err) => {
+			conn = (await connection.getConnection().catch((err: any) => {
 				console.log(err);
-			});
+				return;
+			})) as mariadb.PoolConnection;
 			const rows = await conn.query(
 				'SELECT course_completions.timecompleted, course.idnumber, user.username\n' +
 					'FROM course_completions\n' +
@@ -50,7 +52,7 @@ module.exports = {
 				try {
 					await ldapHelper
 						.addUserToGroup(rows[i][2], rows[i][1])
-						.catch((err) => {
+						.catch((err: any) => {
 							console.log(err);
 						});
 					if (rows[i][0] > latestCompletion) {
@@ -64,7 +66,7 @@ module.exports = {
 			console.log(err);
 		} finally {
 			await storage.setItem('latestCompletion', latestCompletion);
-			if (conn) conn.release();
+			conn?.release();
 		}
 	},
 	runOnStart: true

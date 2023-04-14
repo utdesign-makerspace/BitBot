@@ -1,15 +1,15 @@
-const printers = require('../lib/printers');
-const ldap = require('../lib/ldap');
-const Discord = require('discord.js');
+import printers = require('../lib/printers');
+import ldap = require('../lib/ldap');
+import * as Discord from 'discord.js';
 
 module.exports = {
 	name: 'PrintDone',
-	execute: async (data, printerId, client) => {
-		const ldapUser = await ldap.getUserByUsername(data.owner, 'discord');
+	execute: async (data: any, printerId: string, client: Discord.Client) => {
+		const ldapUser = await ldap.getUserByUsername(data.owner, ['discord']);
 
 		// If there is no user, we can't do anything. Otherwise, get the user.
 		if (ldapUser && ldapUser.discord) {
-			const user = await client.users.fetch(ldapUser.discord);
+			const user = await client.users.fetch(ldapUser.discord as string);
 			if (user) {
 				// Construct our embed and get snapshot
 				const [embed, snapshotBuffer] = await Promise.all([
@@ -37,7 +37,10 @@ module.exports = {
 
 				// Send the embed to the user.
 				await user
-					.send({ embeds: [embed], files: [snapshot] })
+					.send({
+						embeds: [embed],
+						files: snapshot ? [snapshot] : []
+					})
 					.catch(() => {
 						// If the user is not accepting DMs, we can't send them the message.
 						console.log(
@@ -50,3 +53,5 @@ module.exports = {
 		printers.updateWatcher(printerId, client);
 	}
 };
+
+export {};

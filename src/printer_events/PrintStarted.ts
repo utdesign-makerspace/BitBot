@@ -1,15 +1,16 @@
-const printers = require('../lib/printers');
-const ldap = require('../lib/ldap');
-const constants = require('../lib/constants');
+import printers = require('../lib/printers');
+import ldap = require('../lib/ldap');
+import constants = require('../lib/constants');
+import * as Discord from 'discord.js';
 
 module.exports = {
 	name: 'PrintStarted',
-	execute: async (data, printerId, client) => {
-		const ldapUser = await ldap.getUserByUsername(data.owner, 'discord');
+	execute: async (data: any, printerId: string, client: Discord.Client) => {
+		const ldapUser = await ldap.getUserByUsername(data.owner, ['discord']);
 
 		// If there is no user, we can't do anything. Otherwise, get the user.
 		if (!ldapUser || !ldapUser.discord) return;
-		const user = await client.users.fetch(ldapUser.discord);
+		const user = await client.users.fetch(ldapUser.discord as string);
 		if (!user) return;
 
 		// Construct our embed.
@@ -26,3 +27,5 @@ module.exports = {
 		await user.send({ embeds: [embed] });
 	}
 };
+
+export {};
