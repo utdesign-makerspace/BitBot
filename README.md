@@ -6,7 +6,7 @@
     <a href="https://github.com/utdesign-makerspace/BitBot/commits/main"><img src="https://img.shields.io/github/last-commit/utdesign-makerspace/BitBot.svg" /></a>
     <a href="https://github.com/utdesign-makerspace/BitBot/blob/main/LICENSE"><img src="https://img.shields.io/github/license/utdesign-makerspace/BitBot" /></a>
     <a href="https://utd.ms/discord"><img src="https://img.shields.io/discord/593125987177463809?color=%235865F2&label=discord" /></a>
-    <a href="https://github.com/utdesign-makerspace/BitBot/tree/main/src/commands"><img src="https://img.shields.io/github/directory-file-count/utdesign-makerspace/BitBot/src/commands"></a>
+    <a href="https://github.com/utdesign-makerspace/BitBot/tree/main/src/commands"><img src="https://img.shields.io/github/directory-file-count/utdesign-makerspace/BitBot/src/commands?label=commands"></a>
 </p>
 
 # About
