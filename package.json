@@ -36,7 +36,7 @@
 		"googleapis": "^108.0.0",
 		"humanize-duration": "^3.27.0",
 		"ldapjs": "^2.3.1",
-		"ldapjs-promise": "^1.0.6",
+		"ldapjs-promise": "^2.0.1",
 		"mariadb": "^3.0.0",
 		"mongoose": "^6.0.12",
 		"mqtt": "^4.2.8",
