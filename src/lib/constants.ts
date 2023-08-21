@@ -28,7 +28,7 @@ export const contributors: String[] = [
 export const printers: Record<string, Printer> = {
 	draco: {
 		name: 'Draco', // [name].utd.ms, should be capitalized
-		ip: '192.168.193.235', // ZeroTier address
+		ip: 'draco', // Tailscale address
 		model: 'Ender-3 Max', // Model of the printer, manufacturer should not be included unless necessary (ex. Prusa Mini+)
 		apikey: process.env.MAX_APIKEY ?? '', // API key to use REST API
 		color: '#31373d', // DEPRECATED! Hex code that matches emoji color on Discord
@@ -39,7 +39,7 @@ export const printers: Record<string, Printer> = {
 	},
 	virgo: {
 		name: 'Virgo',
-		ip: '192.168.193.20',
+		ip: 'virgo',
 		model: 'Ender-3 Pro',
 		apikey: process.env.WHITE_APIKEY ?? '',
 		color: '#e6e7e8',
@@ -50,7 +50,7 @@ export const printers: Record<string, Printer> = {
 	},
 	orion: {
 		name: 'Orion',
-		ip: '192.168.193.60',
+		ip: 'orion',
 		model: 'Ender-3 Pro',
 		apikey: process.env.YELLOW_APIKEY ?? '',
 		color: '#fdcb58',
@@ -61,7 +61,7 @@ export const printers: Record<string, Printer> = {
 	},
 	taurus: {
 		name: 'Taurus',
-		ip: '192.168.193.134',
+		ip: 'taurus',
 		model: 'Ender-3 Pro',
 		apikey: process.env.GREEN_APIKEY ?? '',
 		color: '#78b159',
@@ -72,7 +72,7 @@ export const printers: Record<string, Printer> = {
 	},
 	pegasus: {
 		name: 'Pegasus',
-		ip: '192.168.193.232',
+		ip: 'pegasus',
 		model: 'Prusa i3 MK3S+',
 		apikey: process.env.PEGASUS_APIKEY ?? '',
 		color: '#aa8ed6',
@@ -83,7 +83,7 @@ export const printers: Record<string, Printer> = {
 	},
 	phoenix: {
 		name: 'Phoenix',
-		ip: '192.168.193.242',
+		ip: 'phoenix',
 		model: 'Prusa i3 MK3S+',
 		apikey: process.env.PHOENIX_APIKEY ?? '',
 		color: '#aa8ed6',
@@ -94,7 +94,7 @@ export const printers: Record<string, Printer> = {
 	},
 	leo: {
 		name: 'Leo',
-		ip: '192.168.193.76',
+		ip: 'leo',
 		model: 'Prusa Mini+',
 		apikey: process.env.ORANGE_APIKEY ?? '',
 		color: '#f4900c',
@@ -105,7 +105,7 @@ export const printers: Record<string, Printer> = {
 	},
 	hydra: {
 		name: 'Hydra',
-		ip: '192.168.193.251',
+		ip: 'hydra',
 		model: 'QIDI Tech 1 Dual Extruder',
 		apikey: process.env.PURPLE_APIKEY ?? '',
 		color: '#aa8ed6',

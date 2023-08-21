@@ -236,7 +236,8 @@ export async function getJob(printerID: string): Promise<PrinterJob | null> {
 				},
 				httpsAgent: new https.Agent({
 					rejectUnauthorized: false
-				})
+				}),
+				timeout: 1000
 			});
 			resolve(data);
 		} catch (error) {
@@ -266,7 +267,8 @@ export async function getSnapshotBuffer(
 				httpsAgent: new https.Agent({
 					rejectUnauthorized: false
 				}),
-				responseType: 'arraybuffer'
+				responseType: 'arraybuffer',
+				timeout: 5000
 			});
 			resolve(Buffer.from(snapshotData, 'utf-8'));
 		} catch (error) {
@@ -298,7 +300,8 @@ export async function cancelJob(printerID: string): Promise<PrinterJob | null> {
 				}),
 				data: {
 					command: 'cancel'
-				}
+				},
+				timeout: 1000
 			});
 			resolve(data);
 		} catch (error) {
