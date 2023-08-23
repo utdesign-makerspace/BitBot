@@ -1,5 +1,5 @@
 const dotenv = require('dotenv');
-const Discord = require('discord.js');
+import * as Discord from 'discord.js';
 dotenv.config();
 
 export interface Printer {
@@ -122,9 +122,19 @@ export const printerChoices: [name: string, value: string][] = Object.keys(
 	return [printers[key].name, key];
 });
 
+export const printerSelectChoices: Discord.StringSelectMenuOptionBuilder[] =
+	Object.keys(printers).map((key) => {
+		return new Discord.StringSelectMenuOptionBuilder()
+			.setLabel(printers[key].name)
+			.setDescription(`${printers[key].model}`)
+			.setEmoji(printers[key].emoji)
+			.setValue(key);
+	});
+
 export const status = {
 	detailsButtonId: 'details',
 	cancelButtonId: 'cancel',
+	printerSelectId: 'printerselect',
 	showButtonText: 'View Details',
 	hideButtonText: 'Hide Details',
 	cancelButtonText: 'Cancel Print',

@@ -24,6 +24,9 @@ export async function getMessage(
 	]);
 	// If no state, we assume the printer is borked
 	if (!data) {
+		let snapshot = new Discord.AttachmentBuilder(Buffer.from(''), {
+			name: 'snapshot.jpg'
+		});
 		statusEmbed
 			.setTitle('⚠  OctoPrint Offline')
 			.addFields(
@@ -34,21 +37,22 @@ export async function getMessage(
 					inline: false
 				}
 			)
-			.setColor('#dd2e44');
-		return { embeds: [statusEmbed] };
+			.setColor('#dd2e44')
+			.setImage('attachment://snapshot.jpg');
+		return { embeds: [statusEmbed], files: [snapshot] };
 	} else {
 		// Get the snapshot
 		const [snapshotBuffer, printerDb] = await Promise.all([
 			this.getSnapshotBuffer(printerID),
 			this.getPrinterFromDb(printerID)
 		]);
-		let snapshot;
-		if (snapshotBuffer) {
-			snapshot = new Discord.AttachmentBuilder(snapshotBuffer, {
+		let snapshot = new Discord.AttachmentBuilder(
+			snapshotBuffer ?? Buffer.from(''),
+			{
 				name: 'snapshot.jpg'
-			});
-			statusEmbed.setImage('attachment://snapshot.jpg');
-		}
+			}
+		);
+		statusEmbed.setImage('attachment://snapshot.jpg');
 
 		// Determine availability using constants
 		const printerState = constants.states.get(data.state.toLowerCase());

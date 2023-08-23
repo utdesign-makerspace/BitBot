@@ -53,5 +53,3 @@ module.exports = {
 		printers.updateWatcher(printerId, client);
 	}
 };
-
-export {};
