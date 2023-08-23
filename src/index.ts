@@ -52,6 +52,7 @@ import constants = require('./lib/constants');
 import cron = require('cron');
 import Sentry = require('@sentry/node');
 import farm = require('./lib/farm');
+import printers = require('./lib/printers');
 require('./helpers/deploy-commands')();
 import snippetModel = require('./lib/models/snippetSchema');
 import * as Discord from 'discord.js';
@@ -181,12 +182,9 @@ client.once('ready', async () => {
 client.on('messageCreate', async (message: Discord.Message) => {
 	if (message.author.bot) return;
 
-	snippets.forEach((s) => {
-		s.triggers.forEach((t: string) => {
-			const r = new RegExp(
-				`${t.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace('*', '.*')}`,
-				'igs'
-			);
+	for (const s of snippets.values()) {
+		for (const t of s.triggers) {
+			const r = new RegExp(t, 'igs');
 			if (message.content.match(r)) {
 				// TODO: Move this to a library
 				const embed = new Discord.EmbedBuilder()
@@ -198,10 +196,11 @@ client.on('messageCreate', async (message: Discord.Message) => {
 						iconURL: 'https://i.imgur.com/lSwBDLb.png',
 						url: 'https://utdmaker.space/'
 					});
-				message.reply({ embeds: [embed] });
+				await message.reply({ embeds: [embed] });
+				break;
 			}
-		});
-	});
+		}
+	}
 });
 
 client.on('interactionCreate', async (interaction: Discord.Interaction) => {
@@ -243,7 +242,6 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 		}
 	}
 
-	// check if interaction is a button and has an embed
 	if (interaction.isModalSubmit()) {
 		if (interaction.customId === 'addSnippet') {
 			// create a new snippet in the database
@@ -310,6 +308,73 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 				console.log(err);
 				return;
 			}
+		}
+	}
+
+	if (interaction.isStringSelectMenu()) {
+		if (interaction.customId === constants.status.printerSelectId) {
+			interaction.deferUpdate();
+
+			// Grab our arguments
+			const printerID = interaction.values[0];
+
+			// Get the message options for the printer
+			let msg = await printers.getMessage(printerID, false);
+
+			// Create the buttons
+			const refreshButton = new Discord.ButtonBuilder({
+				customId: `${constants.status.detailsButtonId} ${printerID} 0`,
+				label: constants.status.refreshButtonText,
+				style: Discord.ButtonStyle.Secondary
+			});
+			const detailsButton = new Discord.ButtonBuilder({
+				customId: `${constants.status.detailsButtonId} ${printerID} 1`,
+				label: constants.status.showButtonText,
+				style: Discord.ButtonStyle.Secondary
+			});
+			const cancelButton = new Discord.ButtonBuilder({
+				customId: `${constants.status.cancelButtonId} ${printerID}`,
+				label: constants.status.cancelButtonText,
+				style: Discord.ButtonStyle.Danger,
+				disabled: true
+			});
+			// Allow stopping print if officer
+			if (
+				(
+					interaction.member?.roles as Discord.GuildMemberRoleManager
+				).cache.some((role) => role.name === constants.officerRoleName)
+			)
+				cancelButton.setDisabled(false);
+			const buttonRow =
+				new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
+					refreshButton,
+					detailsButton
+				);
+
+			// Create a select menu with the different printers
+			const printerRow =
+				new Discord.ActionRowBuilder<Discord.SelectMenuBuilder>().addComponents(
+					new Discord.StringSelectMenuBuilder()
+						.setCustomId(constants.status.printerSelectId)
+						.setPlaceholder('Select a printer')
+						.addOptions(
+							// make sure printer requested is default
+							constants.printerSelectChoices.map((option) => {
+								option.setDefault(
+									option.data.value == printerID
+								);
+								return option;
+							})
+						)
+				);
+
+			// Only add view and cancel buttons if printer in use
+			const data = await printers.getJob(printerID);
+			if (data && (data.state == 'Printing' || data.state == 'Paused'))
+				buttonRow.addComponents(cancelButton);
+
+			msg.components = [printerRow, buttonRow];
+			await interaction.editReply(msg);
 		}
 	}
 

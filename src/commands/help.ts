@@ -22,6 +22,14 @@ module.exports = {
 			.addFields({
 				name: '3D Printing',
 				value: 'Check the status of printers at any time using /status. Link your Discord and UTDesign Makerspace accounts using /link to receive notifications for your 3D prints.'
+			})
+			.addFields({
+				name: 'Profiles',
+				value: 'Link your Makerspace account using /link. You can view a profile using /profile with a Discord or Makerspace user.'
+			})
+			.addFields({
+				name: 'Snippets',
+				value: 'Share answers to commonly asked questions using /snippet. You can post a snippet using /snippet with its name.'
 			});
 		interaction.editReply({ embeds: [helpEmbed] });
 	}

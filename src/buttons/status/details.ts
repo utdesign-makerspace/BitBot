@@ -48,12 +48,28 @@ module.exports = {
 				refreshButton,
 				detailsButton
 			);
+
+		// Create a select menu with the different printers
+		const printerRow =
+			new Discord.ActionRowBuilder<Discord.SelectMenuBuilder>().addComponents(
+				new Discord.StringSelectMenuBuilder()
+					.setCustomId(constants.status.printerSelectId)
+					.setPlaceholder('Select a printer')
+					.addOptions(
+						// make sure printer requested is default
+						constants.printerSelectChoices.map((option) => {
+							option.setDefault(option.data.value == printerID);
+							return option;
+						})
+					)
+			);
+
 		// Only add view and cancel buttons if printer in use
 		const data = await printers.getJob(printerID);
 		if (data && (data.state == 'Printing' || data.state == 'Paused'))
 			buttonRow.addComponents(cancelButton);
 
-		msg.components = [buttonRow];
+		msg.components = [printerRow, buttonRow];
 		await interaction.editReply(msg);
 	}
 };

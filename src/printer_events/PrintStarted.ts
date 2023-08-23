@@ -27,5 +27,3 @@ module.exports = {
 		await user.send({ embeds: [embed] });
 	}
 };
-
-export {};

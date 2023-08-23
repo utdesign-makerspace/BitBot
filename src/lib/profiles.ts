@@ -61,12 +61,7 @@ export async function displayProfile(
 		);
 
 		// Create the base embed
-		profileEmbed
-			.setTitle(`${ldapMember.cn}`)
-			.addFields(
-				{ name: 'Bits', value: 'WIP', inline: true },
-				{ name: 'Total Bits', value: 'WIP', inline: true }
-			);
+		profileEmbed.setTitle(`${ldapMember.cn}`);
 
 		// Add membership status
 		if (member?.roles.cache.some((role) => role.name == 'Staff'))
