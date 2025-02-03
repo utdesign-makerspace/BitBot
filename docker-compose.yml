@@ -14,7 +14,7 @@ services:
     image: mongo:5.0
     restart: "unless-stopped"
     env_file:
-      - path: .env.db
+      - path: ./.env.db
         required: true
     volumes:
       - ./data/db:/data/db
