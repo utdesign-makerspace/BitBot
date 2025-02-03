@@ -106,10 +106,9 @@ dist
 # Build artifacts
 build/
 
-# Lockfiles
-package-lock.json
-
 # Private credentials
 google-credentials.json
 
 .node-persist/
+
+data/
