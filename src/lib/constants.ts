@@ -24,7 +24,8 @@ export const contributors: String[] = [
 	'714700986601570335',
 	'221081030562414593',
 	'484569856872808470',
-	'251845888710803458'
+	'251845888710803458',
+	'374283134243700747'
 ];
 
 export const printers: Record<string, Printer> = {
@@ -93,18 +94,18 @@ export const printers: Record<string, Printer> = {
 		enabled: true,
 		ssl: false,
 		emoji: '<:prusamini:1086128822702833754>'
-	},
-	hydra: {
-		name: 'Hydra',
-		ip: 'hydra.utd.ms',
-		model: 'QIDI Tech 1 Dual Extruder',
-		apikey: process.env.PURPLE_APIKEY ?? '',
-		color: '#aa8ed6',
-		thumbnail: 'https://i.imgur.com/SAe11rI.png',
-		enabled: true,
-		ssl: false,
-		emoji: '<:qiditech1:1086129706614669435>'
 	}
+	// hydra: {
+	// 	name: 'Hydra',
+	// 	ip: 'hydra.utd.ms',
+	// 	model: 'QIDI Tech 1 Dual Extruder',
+	// 	apikey: process.env.PURPLE_APIKEY ?? '',
+	// 	color: '#aa8ed6',
+	// 	thumbnail: 'https://i.imgur.com/SAe11rI.png',
+	// 	enabled: true,
+	// 	ssl: false,
+	// 	emoji: '<:qiditech1:1086129706614669435>'
+	// }
 };
 
 export const printerChoices: [name: string, value: string][] = Object.keys(
