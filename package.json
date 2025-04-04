@@ -22,7 +22,7 @@
 	},
 	"homepage": "https://github.com/utdesign-makerspace/BitBot#readme",
 	"dependencies": {
-		"@discordjs/builders": "^0.12.0",
+		"@discordjs/builders": "^1.4.0",
 		"@discordjs/rest": "^1.1.0",
 		"@sentry/node": "^7.14.1",
 		"@sentry/tracing": "^7.14.1",
