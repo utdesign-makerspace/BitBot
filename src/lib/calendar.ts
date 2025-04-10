@@ -1,6 +1,6 @@
-import { calendar_v3, google } from 'googleapis';
-const { addWeeks } = require('date-fns');
-import * as Discord from 'discord.js';
+import { type calendar_v3, google } from 'googleapis';
+import { addWeeks } from 'date-fns';
+import type * as Discord from 'discord.js';
 const { CALENDAR_ID } = process.env;
 
 export interface Event {
@@ -82,5 +82,15 @@ export async function updateDiscordEvents(guild: Discord.Guild): Promise<void> {
 			// );
 		}
 	});
+	return;
+}
+
+export async function deleteDiscordEvents(guild: Discord.Guild): Promise<void> {
+	const events = await guild.scheduledEvents.fetch();
+	for (const [, event] of events) {
+		await event.delete();
+		console.log(`🗑️ Deleted ${event.name} event on Discord`);
+	}
+	console.log('✅ All events deleted'); 
 	return;
 }
