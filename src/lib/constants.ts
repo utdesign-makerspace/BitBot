@@ -31,7 +31,7 @@ export const contributors: String[] = [
 export const printers: Record<string, Printer> = {
 	virgo: {
 		name: 'Virgo',
-		ip: 'virgo.utd.ms',
+		ip: 'virgo.internal.utd.ms',
 		model: 'Prusa MK4',
 		apikey: process.env.WHITE_APIKEY ?? '',
 		color: '#e6e7e8',
@@ -42,7 +42,7 @@ export const printers: Record<string, Printer> = {
 	},
 	orion: {
 		name: 'Orion',
-		ip: 'orion.utd.ms',
+		ip: 'orion.internal.utd.ms',
 		model: 'Prusa MK4',
 		apikey: process.env.YELLOW_APIKEY ?? '',
 		color: '#fdcb58',
@@ -53,7 +53,7 @@ export const printers: Record<string, Printer> = {
 	},
 	taurus: {
 		name: 'Taurus',
-		ip: 'taurus.utd.ms',
+		ip: 'taurus.internal.utd.ms',
 		model: 'Prusa Mini+',
 		apikey: process.env.GREEN_APIKEY ?? '',
 		color: '#78b159',
@@ -64,7 +64,7 @@ export const printers: Record<string, Printer> = {
 	},
 	pegasus: {
 		name: 'Pegasus',
-		ip: 'pegasus.utd.ms',
+		ip: 'pegasus.internal.utd.ms',
 		model: 'Prusa i3 MK3S+',
 		apikey: process.env.PEGASUS_APIKEY ?? '',
 		color: '#aa8ed6',
@@ -75,7 +75,7 @@ export const printers: Record<string, Printer> = {
 	},
 	phoenix: {
 		name: 'Phoenix',
-		ip: 'phoenix.utd.ms',
+		ip: 'phoenix.internal.utd.ms',
 		model: 'Prusa i3 MK3S+',
 		apikey: process.env.PHOENIX_APIKEY ?? '',
 		color: '#aa8ed6',
@@ -86,7 +86,7 @@ export const printers: Record<string, Printer> = {
 	},
 	leo: {
 		name: 'Leo',
-		ip: 'leo.utd.ms',
+		ip: 'leo.internal.utd.ms',
 		model: 'Prusa Mini+',
 		apikey: process.env.ORANGE_APIKEY ?? '',
 		color: '#f4900c',
