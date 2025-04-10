@@ -5,7 +5,7 @@ import constants = require('../lib/constants');
 // NOTE: All methods assume message will NOT be ephemeral. You will need to add that yourself.
 
 export async function displayProfile(
-	interaction: Discord.Interaction
+	interaction: Discord.ChatInputCommandInteraction
 ): Promise<void> {
 	if (
 		!interaction.isContextMenuCommand() &&

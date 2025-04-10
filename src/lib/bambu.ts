@@ -33,5 +33,5 @@ export async function getIPAddressesBySerialNumber() {
     "03919C443000087": { ip: "192.168.1.51", name: "TBD" },
     "03919C443000083": { ip: "192.168.1.53", name: "TBD" },
     "03919C450801968": { ip: "192.168.1.48", name: "TBD" }
-  }
+  } as Record<string, { ip: string, name: string }>
 }

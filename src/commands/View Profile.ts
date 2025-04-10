@@ -9,6 +9,7 @@ module.exports = {
 	ephemeral: true,
 	context: true,
 	async execute(interaction: Discord.Interaction) {
+		// @ts-ignore
 		profile.displayProfile(interaction);
 	}
 };

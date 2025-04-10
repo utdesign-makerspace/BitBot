@@ -1,5 +1,5 @@
 import { Bambu } from "bambu.ts"
-import { getAccessCodesBySerialNumber, getIPAddressesBySerialNumber } from "../lib/bambu.js"
+import { getAccessCodesBySerialNumber, getIPAddressesBySerialNumber } from "../lib/bambu"
 import * as Discord from 'discord.js';
 
 type Errors = {
@@ -17,6 +17,11 @@ type Result = {serialNumber: string} & ({ok: true} | {ok: false, error: Errors})
 module.exports = {
 	cron: '0 */15 * * * *',
 	action: async (client: Discord.Client) => {
+        const channelId = process.env.INCIDENTS_CHANNEL_ID
+        if (!channelId) {
+            console.log("Could not find incidents channel.")
+            return
+        }
         const serialNumbersToIpAddresses = await getIPAddressesBySerialNumber()
         const serialNumbersToAccessCodes = await getAccessCodesBySerialNumber()
 
@@ -62,7 +67,7 @@ module.exports = {
 
         for (const result of results) {
             if (!result.ok) {
-                const channel = client.channels.cache.get(process.env.INCIDENTS_CHANNEL_ID)
+                const channel = client.channels.cache.get(channelId)
                 if (!channel || !(channel.type === Discord.ChannelType.GuildText)) {
                     console.log("Could not find incidents channel")
                     return
