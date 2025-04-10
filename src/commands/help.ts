@@ -12,7 +12,7 @@ module.exports = {
 			.setAuthor({
 				name: 'UTDesign Makerspace',
 				iconURL: 'https://i.imgur.com/lSwBDLb.png',
-				url: 'https://utdmaker.space/'
+				url: 'https://utd.ms/'
 			})
 			.setThumbnail('https://i.imgur.com/lSwBDLb.png')
 			.setTitle('BitBot')

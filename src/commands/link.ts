@@ -29,12 +29,12 @@ module.exports = {
 					embed
 						.setTitle(`Account Already Linked`)
 						.setDescription(
-							`Your Discord account is already linked to the UTDesign Makerspace account **${user.uid}**. Please contact an officer if this needs to be changed. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
+							`Your Discord account is already linked to the UTDesign Makerspace account **${user.uid}**. Please contact an officer if this needs to be changed. For more information, please visit [the BitBot wiki page](https://wiki.utd.ms/en/bitbot).`
 						);
 
 					const button = new Discord.ButtonBuilder()
 						.setLabel('More Information')
-						.setURL('https://wiki.utdmaker.space/en/bitbot')
+						.setURL('https://wiki.utd.ms/en/bitbot')
 						.setStyle(Discord.ButtonStyle.Link);
 					const buttonRow =
 						new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(
@@ -53,19 +53,19 @@ module.exports = {
 							embed
 								.setTitle(`Account Linked`)
 								.setDescription(
-									`Your Discord account has been linked to the UTDesign Makerspace account **${netid}**. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
+									`Your Discord account has been linked to the UTDesign Makerspace account **${netid}**. For more information, please visit [the BitBot wiki page](https://wiki.utd.ms/en/bitbot).`
 								);
 						} else {
 							embed
 								.setTitle(`Account Not Found`)
 								.setDescription(
-									`The UTDesign Makerspace account **${netid}** could not be found. For more information, please visit [the BitBot wiki page](https://wiki.utdmaker.space/en/bitbot).`
+									`The UTDesign Makerspace account **${netid}** could not be found. For more information, please visit [the BitBot wiki page](https://wiki.utd.ms/en/bitbot).`
 								);
 						}
 
 						const button = new Discord.ButtonBuilder()
 							.setLabel('More Information')
-							.setURL('https://wiki.utdmaker.space/en/bitbot')
+							.setURL('https://wiki.utd.ms/en/bitbot')
 							.setStyle(Discord.ButtonStyle.Link);
 						const buttonRow =
 							new Discord.ActionRowBuilder<Discord.ButtonBuilder>().addComponents(

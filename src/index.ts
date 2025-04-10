@@ -194,7 +194,7 @@ client.on('messageCreate', async (message: Discord.Message) => {
 					.setAuthor({
 						name: 'UTDesign Makerspace',
 						iconURL: 'https://i.imgur.com/lSwBDLb.png',
-						url: 'https://utdmaker.space/'
+						url: 'https://utd.ms/'
 					});
 				await message.reply({ embeds: [embed] });
 				break;
