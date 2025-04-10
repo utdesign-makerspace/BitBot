@@ -17,7 +17,7 @@ type Result = {serialNumber: string} & ({ok: true} | {ok: false, error: Errors})
 
 
 module.exports = {
-	cron: '0 */15 * * * *',
+	cron: '0 * */8 * * *',
 	action: async (client: Discord.Client) => {
         const channelId = process.env.INCIDENTS_CHANNEL_ID
         if (!channelId) {
