@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from 'discord.js';
 import * as Discord from 'discord.js';
 import constants = require('../lib/constants');
 import printers = require('../lib/printers');

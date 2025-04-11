@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { SlashCommandBuilder } from 'discord.js';
 import * as Discord from 'discord.js';
 import printers = require('../lib/printers');
 import printerModel = require('../lib/models/printerSchema');
