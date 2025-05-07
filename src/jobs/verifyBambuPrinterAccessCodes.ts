@@ -15,17 +15,22 @@ type Errors = {
 type Result = {serialNumber: string} & ({ok: true} | {ok: false, error: Errors})
 
 
+const ENABLE_CHECK = false;
 
 module.exports = {
 	cron: '0 * */8 * * *',
 	action: async (client: Discord.Client) => {
+    if (!ENABLE_CHECK) {
+      console.log("Bambu printer access code check is disabled. Skipping.")
+      return;
+    }
+    if (process.env.NODE_ENV !== 'production') return
         const channelId = process.env.INCIDENTS_CHANNEL_ID
         if (!channelId) {
             console.log("Could not find incidents channel.")
             return
         }
-        const serialNumbersToIpAddresses = await getIPAddressesBySerialNumber()
-        const serialNumbersToAccessCodes = await getAccessCodesBySerialNumber()
+        const [serialNumbersToIpAddresses, serialNumbersToAccessCodes] = await Promise.all([getIPAddressesBySerialNumber(), getAccessCodesBySerialNumber()])
 
 
         function verifyPrinterAccessCode(printerSerialNumber: string): Promise<Result> {
@@ -35,7 +40,7 @@ module.exports = {
                 return res({ok: false, error: {type:"APP_CONFIG_ERROR", message: "Entry missing"}, serialNumber: printerSerialNumber})
               }
               
-              const {ip, name} = entry
+              const {ip} = entry
               const accessCode = serialNumbersToAccessCodes[printerSerialNumber]
               
               if (!accessCode) {

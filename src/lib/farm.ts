@@ -5,7 +5,7 @@ import { getPrinterFromDb, getJob, PrinterJob } from './printers';
 // NOTE: All methods assume message will NOT be ephemeral. You will need to add that yourself.
 
 export async function getFarmEmbed(): Promise<Discord.InteractionReplyOptions> {
-	return new Promise(async (resolve) => {
+
 		// Create our base embed
 		let statusEmbed = new Discord.EmbedBuilder()
 			.setColor('#c1393d')
@@ -26,8 +26,8 @@ export async function getFarmEmbed(): Promise<Discord.InteractionReplyOptions> {
 
 		// Compares each state and determines printer status to display
 		for (let i = 0; i < printerArray.length; i++) {
-			let printer = printerArray[i];
-			let printerText = `${printer.emoji} ${printer.name}\n`;
+			const printer = printerArray[i];
+			const printerText = `${printer.emoji} ${printer.name}\n`;
 			let state;
 			if (farmState[i]) state = states.get(farmState[i].toLowerCase());
 
@@ -57,32 +57,31 @@ export async function getFarmEmbed(): Promise<Discord.InteractionReplyOptions> {
 				inline: true
 			});
 
-		resolve({ embeds: [statusEmbed], ephemeral: true });
-	});
+		return ({ embeds: [statusEmbed], ephemeral: true });
+
 }
 
 export async function getFarmState(): Promise<(string | null)[]> {
-	return new Promise(async (resolve) => {
-		// Creates an array of printer states. Indexes match those of printers
-		const printerArray = Object.keys(printers).map((key) => {
-			const data = printers[key];
-			data.key = key;
-			return data;
-		});
-		const stateArray: (string | null)[] = [];
 
-		for (let i = 0; i < printerArray.length; i++) {
-			// Search the database for maintenance, otherwise use job status
-			let printerDb = await getPrinterFromDb(printerArray[i].key ?? '');
-			if (printerDb?.underMaintenance) stateArray.push('maintenance');
-			else {
-				let printerData = await getJob(printerArray[i].key ?? '');
-				if (printerData) stateArray.push(printerData.state);
-				else stateArray.push(null);
-			}
-		}
-		resolve(stateArray);
+	// Creates an array of printer states. Indexes match those of printers
+	const printerArray = Object.keys(printers).map((key) => {
+		const data = printers[key];
+		data.key = key;
+		return data;
 	});
+	const stateArray: (string | null)[] = [];
+
+	for (let i = 0; i < printerArray.length; i++) {
+		// Search the database for maintenance, otherwise use job status
+		const printerDb = await getPrinterFromDb(printerArray[i].key ?? '');
+		if (printerDb?.underMaintenance) stateArray.push('maintenance');
+		else {
+			const printerData = await getJob(printerArray[i].key ?? '');
+			if (printerData) stateArray.push(printerData.state);
+			else stateArray.push(null);
+		}
+	}
+	return stateArray;
 }
 
 export async function setPresence(client: Discord.Client): Promise<void> {

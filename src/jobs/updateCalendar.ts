@@ -8,7 +8,11 @@ module.exports = {
 		const guild = client.guilds.cache.get(
 			process.env.GUILD_ID ?? '593125987177463809'
 		);
-		// console.log(`- Updating calendar for ${guild.name}... -`);
-		if (guild) await calendar.updateDiscordEvents(guild);
+		if (!guild) {
+			console.log('No guild found');
+			return;
+		}
+		console.log(`- Updating calendar for ${guild.name}... -`);
+		await calendar.updateDiscordEvents(guild);
 	}
 };

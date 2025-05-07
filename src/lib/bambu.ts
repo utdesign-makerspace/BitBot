@@ -29,7 +29,7 @@ export async function getAccessCodesBySerialNumber(): Promise<
 export async function getIPAddressesBySerialNumber() {
   // TODO: put printers into bitbot db
   return {
-    "03919C443000082": { ip: "192.168.1.41", name: "Mercury (utd.ms)" },
+    "03919C443000082": { ip: "192.168.1.53", name: "Mercury (utd.ms)" },
     "03919C443000087": { ip: "192.168.1.51", name: "Venus (utd.ms)" },
     "03919C443000092": { ip: "192.168.1.41", name: "Mars (utd.ms)" },
     "03919C450801945": { ip: "192.168.1.49", name: "Neptune (utd.ms)" },

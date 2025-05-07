@@ -6,7 +6,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('snipadmin')
 		.setDescription('Admin commands for managing snippets.')
-		.setDefaultPermission(false)
+		.setDefaultMemberPermissions(0)
 		.addSubcommand((subcommand) =>
 			subcommand.setName('add').setDescription('Add a new snippet.')
 		)

@@ -51,16 +51,16 @@ export async function getGoogleEvents(): Promise<Event[]> {
 export async function updateDiscordEvents(guild: Discord.Guild): Promise<void> {
 	const currentDate = new Date().getTime();
 	const events = await this.getGoogleEvents();
-	events.forEach(async (e: Event) => {
+	for (const e of events) {
 		const startDate = new Date(e.start);
 		const existingEvent = await guild.scheduledEvents.cache.find(
 			(event) =>
-				event.name == e.summary &&
+				event.name === e.summary &&
 				// @ts-ignore
-				event.scheduledStartAt.getTime() == startDate.getTime()
+				event.scheduledStartAt.getTime() === startDate.getTime()
 		);
 		if (startDate.getTime() > currentDate && !existingEvent) {
-			guild.scheduledEvents.create({
+			await guild.scheduledEvents.create({
 				name: e.summary,
 				scheduledStartTime: startDate,
 				scheduledEndTime: new Date(e.end),
@@ -81,7 +81,7 @@ export async function updateDiscordEvents(guild: Discord.Guild): Promise<void> {
 			// 	`${e.summary} already exists on Discord or has already started`
 			// );
 		}
-	});
+	};
 	return;
 }
 

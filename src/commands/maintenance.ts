@@ -9,7 +9,7 @@ module.exports = {
 		.setDescription(
 			'Enables or disables maintenance mode on a printer depending on if a reason is given.'
 		)
-		.setDefaultPermission(false)
+		.setDefaultMemberPermissions(0)
 		.addStringOption((option) =>
 			option
 				.setName('printer')

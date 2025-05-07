@@ -108,10 +108,10 @@ export const printers: Record<string, Printer> = {
 	// }
 };
 
-export const printerChoices: [name: string, value: string][] = Object.keys(
+export const printerChoices: {name: string, value: string}[] = Object.keys(
 	printers
 ).map((key) => {
-	return [printers[key].name, key];
+	return {name: printers[key].name, value: key};
 });
 
 export const printerSelectChoices: Discord.StringSelectMenuOptionBuilder[] =
