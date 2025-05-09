@@ -1,18 +1,28 @@
 import ldap = require('ldapjs-promise');
 
-export async function getUserByUsername(
-	username: string,
-	attributes = ['cometcard', 'givenName', 'sn', 'mail', 'cn', 'discord']
-): Promise<ldap.SearchEntryObject> {
+let globalClient: ldap.Client | null = null;
+
+async function getLdapClient() {
+	if (globalClient) {
+		return globalClient;
+	}
 	const client = await ldap.createClient({
 		url: process.env.LDAP_URL ?? 'ldap://localhost'
 	});
 
 	await client.bind(
-		process.env.LDAP_BIND_DN ??
-			'uid=admin,cn=users,cn=accounts,dc=example,dc=org',
+		process.env.LDAP_BIND_DN ?? 'cn=admin,dc=example,dc=org',
 		process.env.LDAP_BIND_PASS ?? 'password'
 	);
+	globalClient = client;
+	return client;
+}
+
+export async function getUserByUsername(
+	username: string,
+	attributes = ['cometcard', 'givenName', 'sn', 'mail', 'cn', 'discord']
+): Promise<ldap.SearchEntryObject> {
+	const client = await getLdapClient();
 	const { entries: users } = await client.searchReturnAll(
 		process.env.LDAP_MEMBERS_BASE ??
 			'cn=users,cn=accounts,dc=example,dc=org',
@@ -29,14 +39,8 @@ export async function getUserByDiscord(
 	discordId: string,
 	attributes = ['cometcard', 'givenName', 'sn', 'mail', 'cn', 'uid']
 ): Promise<ldap.SearchEntryObject> {
-	const client = await ldap.createClient({
-		url: process.env.LDAP_URL ?? 'ldap://localhost'
-	});
+	const client = await getLdapClient();
 
-	await client.bind(
-		process.env.LDAP_BIND_DN ?? 'cn=admin,dc=example,dc=org',
-		process.env.LDAP_BIND_PASS ?? 'password'
-	);
 	const { entries: users } = await client.searchReturnAll(
 		process.env.LDAP_MEMBERS_BASE ??
 			'cn=users,cn=accounts,dc=example,dc=org',
@@ -53,14 +57,8 @@ export async function getGroupsByUsername(
 	username: string,
 	attributes = ['cn', 'uid']
 ): Promise<ldap.SearchEntryObject[]> {
-	const client = await ldap.createClient({
-		url: process.env.LDAP_URL ?? 'ldap://localhost'
-	});
+	const client = await getLdapClient();
 
-	await client.bind(
-		process.env.LDAP_BIND_DN ?? 'cn=admin,dc=example,dc=org',
-		process.env.LDAP_BIND_PASS ?? 'password'
-	);
 	const { entries: groups } = await client.searchReturnAll(
 		process.env.LDAP_GROUPS_BASE ??
 			'cn=groups,cn=accounts,dc=example,dc=org',
@@ -77,14 +75,8 @@ export async function addUserToGroup(
 	username: string,
 	group: string
 ): Promise<void> {
-	const client = await ldap.createClient({
-		url: process.env.LDAP_URL ?? 'ldap://localhost'
-	});
+	const client = await getLdapClient();
 
-	await client.bind(
-		process.env.LDAP_BIND_DN ?? 'cn=admin,dc=example,dc=org',
-		process.env.LDAP_BIND_PASS ?? 'password'
-	);
 
 	const data = await client.searchReturnAll(
 		`cn=${group},${process.env.LDAP_GROUPS_BASE}`,
@@ -119,14 +111,7 @@ export async function linkUserToDiscord(
 	username: string,
 	discordId: string
 ): Promise<void> {
-	const client = await ldap.createClient({
-		url: process.env.LDAP_URL ?? 'ldap://localhost'
-	});
-
-	await client.bind(
-		process.env.LDAP_BIND_DN ?? 'cn=admin,dc=example,dc=org',
-		process.env.LDAP_BIND_PASS ?? 'password'
-	);
+	const client = await getLdapClient();
 
 	const change = new ldap.Change({
 		operation: 'add',
