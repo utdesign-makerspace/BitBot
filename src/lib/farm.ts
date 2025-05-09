@@ -4,7 +4,7 @@ import { getPrinterFromDb, getJob, PrinterJob } from './printers';
 
 // NOTE: All methods assume message will NOT be ephemeral. You will need to add that yourself.
 
-export async function getFarmEmbed(): Promise<Discord.InteractionReplyOptions> {
+export async function getFarmEmbed(): Promise<Discord.InteractionEditReplyOptions> {
 
 		// Create our base embed
 		let statusEmbed = new Discord.EmbedBuilder()
@@ -57,7 +57,7 @@ export async function getFarmEmbed(): Promise<Discord.InteractionReplyOptions> {
 				inline: true
 			});
 
-		return ({ embeds: [statusEmbed], ephemeral: true });
+		return ({ embeds: [statusEmbed] });
 
 }
 

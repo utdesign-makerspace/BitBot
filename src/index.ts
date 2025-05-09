@@ -32,12 +32,13 @@ console.log(
 `
 );
 
+require('dotenv').config();
+
 if (process.env.NODE_ENV !== 'production')
 	console.warn(
 		'⚠️ You are not running in production! LDAP sync will not run.\n'
 	);
 
-require('dotenv').config();
 
 const { DISCORD_TOKEN, MONGODB_SRV, MQTT_HOST, MQTT_USER, MQTT_PASS } =
 	process.env;
@@ -319,7 +320,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 			const printerID = interaction.values[0];
 
 			// Get the message options for the printer
-			let msg = await printers.getMessage(printerID, false);
+			const msg = await printers.getMessage(printerID, false);
 
 			// Create the buttons
 			const refreshButton = new Discord.ButtonBuilder({

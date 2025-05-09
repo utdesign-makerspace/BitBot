@@ -16,7 +16,7 @@ export interface PrinterJob {
 export async function getMessage(
 	printerID: string,
 	detailed: boolean
-): Promise<Discord.InteractionReplyOptions> {
+): Promise<Discord.InteractionEditReplyOptions> {
 	// Create beginning of embed and Get the data of our printer
 	const [statusEmbed, data] = await Promise.all([
 		this.getEmbedTemplate(printerID),
@@ -77,7 +77,6 @@ export async function getMessage(
 			statusEmbed.setImage(null);
 			return {
 				embeds: [statusEmbed],
-				ephemeral: true
 			};
 		} else if (printerState == 'available') {
 			statusEmbed
@@ -196,14 +195,12 @@ export async function getMessage(
 			statusEmbed.setImage(null);
 			return {
 				embeds: [statusEmbed],
-				ephemeral: true
 			};
 		}
 
 		// Return message options
 		return {
 			embeds: [statusEmbed],
-			ephemeral: true,
 			files: snapshot ? [snapshot] : []
 		};
 	}

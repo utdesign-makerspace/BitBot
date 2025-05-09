@@ -17,6 +17,7 @@ module.exports = {
 	ephemeral: true,
 	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		const printerID = interaction.options.getString('printer');
+		interaction.deferReply({ ephemeral: true });
 
 		let msg;
 
@@ -92,7 +93,6 @@ module.exports = {
 
 		// Set ephemeral because we don't need everyone to see the status. We can change this once bot
 		// is live and we have a #bot-commands channel to avoid overflow.
-		msg.ephemeral = true;
 		interaction.editReply(msg);
 	}
 };
