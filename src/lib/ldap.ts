@@ -77,7 +77,6 @@ export async function addUserToGroup(
 ): Promise<void> {
 	const client = await getLdapClient();
 
-
 	const data = await client.searchReturnAll(
 		`cn=${group},${process.env.LDAP_GROUPS_BASE}`,
 		{}

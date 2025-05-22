@@ -5,64 +5,61 @@ import { getPrinterFromDb, getJob, PrinterJob } from './printers';
 // NOTE: All methods assume message will NOT be ephemeral. You will need to add that yourself.
 
 export async function getFarmEmbed(): Promise<Discord.InteractionEditReplyOptions> {
+	// Create our base embed
+	let statusEmbed = new Discord.EmbedBuilder()
+		.setColor('#c1393d')
+		.setTitle(':information_source:  Printer Status')
+		.setFooter({ text: 'Printers are first come, first served' })
+		.setTimestamp();
 
-		// Create our base embed
-		let statusEmbed = new Discord.EmbedBuilder()
-			.setColor('#c1393d')
-			.setTitle(':information_source:  Printer Status')
-			.setFooter({ text: 'Printers are first come, first served' })
-			.setTimestamp();
+	let available = '';
+	let inUse = '';
+	let offline = '';
 
-		let available = '';
-		let inUse = '';
-		let offline = '';
+	const farmState = await this.getFarmState();
+	const printerArray: Printer[] = Object.keys(printers).map((key) => {
+		const data = printers[key];
+		data.key = key;
+		return data;
+	});
 
-		const farmState = await this.getFarmState();
-		const printerArray: Printer[] = Object.keys(printers).map((key) => {
-			const data = printers[key];
-			data.key = key;
-			return data;
+	// Compares each state and determines printer status to display
+	for (let i = 0; i < printerArray.length; i++) {
+		const printer = printerArray[i];
+		const printerText = `${printer.emoji} ${printer.name}\n`;
+		let state;
+		if (farmState[i]) state = states.get(farmState[i].toLowerCase());
+
+		if (!farmState[i] || state == 'offline' || state == 'maintenance')
+			offline += printerText;
+		else if (state == 'busy') inUse += printerText;
+		else available += printerText;
+	}
+
+	// Only add field if information for it exists
+	if (available)
+		statusEmbed.addFields({
+			name: 'Available',
+			value: available,
+			inline: true
+		});
+	if (inUse)
+		statusEmbed.addFields({
+			name: 'Busy',
+			value: inUse,
+			inline: true
+		});
+	if (offline)
+		statusEmbed.addFields({
+			name: 'Offline',
+			value: offline,
+			inline: true
 		});
 
-		// Compares each state and determines printer status to display
-		for (let i = 0; i < printerArray.length; i++) {
-			const printer = printerArray[i];
-			const printerText = `${printer.emoji} ${printer.name}\n`;
-			let state;
-			if (farmState[i]) state = states.get(farmState[i].toLowerCase());
-
-			if (!farmState[i] || state == 'offline' || state == 'maintenance')
-				offline += printerText;
-			else if (state == 'busy') inUse += printerText;
-			else available += printerText;
-		}
-
-		// Only add field if information for it exists
-		if (available)
-			statusEmbed.addFields({
-				name: 'Available',
-				value: available,
-				inline: true
-			});
-		if (inUse)
-			statusEmbed.addFields({
-				name: 'Busy',
-				value: inUse,
-				inline: true
-			});
-		if (offline)
-			statusEmbed.addFields({
-				name: 'Offline',
-				value: offline,
-				inline: true
-			});
-
-		return ({ embeds: [statusEmbed] });
-
+	return { embeds: [statusEmbed] };
 }
 
 export async function getFarmState(): Promise<(string | null)[]> {
-
 	// Creates an array of printer states. Indexes match those of printers
 	const printerArray = Object.keys(printers).map((key) => {
 		const data = printers[key];

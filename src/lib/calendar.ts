@@ -81,7 +81,7 @@ export async function updateDiscordEvents(guild: Discord.Guild): Promise<void> {
 			// 	`${e.summary} already exists on Discord or has already started`
 			// );
 		}
-	};
+	}
 	return;
 }
 
@@ -91,6 +91,6 @@ export async function deleteDiscordEvents(guild: Discord.Guild): Promise<void> {
 		await event.delete();
 		console.log(`🗑️ Deleted ${event.name} event on Discord`);
 	}
-	console.log('✅ All events deleted'); 
+	console.log('✅ All events deleted');
 	return;
 }

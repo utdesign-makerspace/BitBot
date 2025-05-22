@@ -76,7 +76,7 @@ export async function getMessage(
 				.setColor('#dd2e44');
 			statusEmbed.setImage(null);
 			return {
-				embeds: [statusEmbed],
+				embeds: [statusEmbed]
 			};
 		} else if (printerState == 'available') {
 			statusEmbed
@@ -194,7 +194,7 @@ export async function getMessage(
 			});
 			statusEmbed.setImage(null);
 			return {
-				embeds: [statusEmbed],
+				embeds: [statusEmbed]
 			};
 		}
 
@@ -247,7 +247,6 @@ export async function getJob(printerID: string): Promise<PrinterJob | null> {
 		}
 		return null;
 	}
-
 }
 
 export async function getSnapshotBuffer(

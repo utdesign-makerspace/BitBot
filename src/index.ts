@@ -39,7 +39,6 @@ if (process.env.NODE_ENV !== 'production')
 		'⚠️ You are not running in production! LDAP sync will not run.\n'
 	);
 
-
 const { DISCORD_TOKEN, MONGODB_SRV, MQTT_HOST, MQTT_USER, MQTT_PASS } =
 	process.env;
 
