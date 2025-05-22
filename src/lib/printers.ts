@@ -223,97 +223,91 @@ export async function getEmbedTemplate(
 }
 
 export async function getJob(printerID: string): Promise<PrinterJob | null> {
-	return new Promise(async (resolve) => {
-		const printer = constants.printers[printerID];
+	const printer = constants.printers[printerID];
 
-		// Try to grab printer job, resolve null if failed
-		try {
-			var { data } = await axios({
-				method: 'get',
-				url: `http${printer.ssl ? 's' : ''}://${printer.ip}/api/job`,
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: 'Bearer ' + printer.apikey
-				},
-				httpsAgent: new https.Agent({
-					rejectUnauthorized: false
-				}),
-				timeout: 1000
-			});
-			resolve(data);
-		} catch (error) {
-			// We don't want to log the error due to it usually being a printer offline.
-			// console.log(error);
-			if (process.env.NODE_ENV === 'production') {
-				Sentry.captureException(error);
-			}
-			resolve(null);
+	// Try to grab printer job, resolve null if failed
+	try {
+		const { data } = await axios({
+			method: 'get',
+			url: `http${printer.ssl ? 's' : ''}://${printer.ip}/api/job`,
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + printer.apikey
+			},
+			httpsAgent: new https.Agent({
+				rejectUnauthorized: false
+			}),
+			timeout: 1000
+		});
+		return data;
+	} catch (error) {
+		// We don't want to log the error due to it usually being a printer offline.
+		if (process.env.NODE_ENV === 'production') {
+			Sentry.captureException(error);
 		}
-	});
+		return null;
+	}
+
 }
 
 export async function getSnapshotBuffer(
 	printerID: string
 ): Promise<Buffer | null> {
-	return new Promise(async (resolve) => {
-		const printer = constants.printers[printerID];
+	const printer = constants.printers[printerID];
 
-		// Get snapshot data then resolve a buffer
-		try {
-			const { data: snapshotData } = await axios({
-				method: 'get',
-				url: `http${printer.ssl ? 's' : ''}://${
-					printer.ip
-				}/webcam/?action=snapshot`,
-				httpsAgent: new https.Agent({
-					rejectUnauthorized: false
-				}),
-				responseType: 'arraybuffer',
-				timeout: 5000
-			});
-			resolve(Buffer.from(snapshotData, 'utf-8'));
-		} catch (error) {
-			// We don't want to log the error due to it usually being a printer offline.
-			// console.log(error);
-			if (process.env.NODE_ENV === 'production') {
-				Sentry.captureException(error);
-			}
-			resolve(null);
+	// Get snapshot data then resolve a buffer
+	try {
+		const { data: snapshotData } = await axios({
+			method: 'get',
+			url: `http${printer.ssl ? 's' : ''}://${
+				printer.ip
+			}/webcam/?action=snapshot`,
+			httpsAgent: new https.Agent({
+				rejectUnauthorized: false
+			}),
+			responseType: 'arraybuffer',
+			timeout: 5000
+		});
+		return Buffer.from(snapshotData, 'utf-8');
+	} catch (error) {
+		// We don't want to log the error due to it usually being a printer offline.
+		// console.log(error);
+		if (process.env.NODE_ENV === 'production') {
+			Sentry.captureException(error);
 		}
-	});
+		return null;
+	}
 }
 
 export async function cancelJob(printerID: string): Promise<PrinterJob | null> {
-	return new Promise(async (resolve) => {
-		const printer = constants.printers[printerID];
+	const printer = constants.printers[printerID];
 
-		// Try to cancel the print job, resolve null if failed
-		try {
-			var { data } = await axios({
-				method: 'post',
-				url: `http${printer.ssl ? 's' : ''}://${printer.ip}/api/job`,
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: 'Bearer ' + printer.apikey
-				},
-				httpsAgent: new https.Agent({
-					rejectUnauthorized: false
-				}),
-				data: {
-					command: 'cancel'
-				},
-				timeout: 1000
-			});
-			resolve(data);
-		} catch (error) {
-			// Printers should only be able to be cancelled if online, so this is an issue we want to log.
-			console.log(error);
-			if (process.env.NODE_ENV === 'production') {
-				Sentry.captureException(error);
-			}
-			resolve(null);
+	// Try to cancel the print job, resolve null if failed
+	try {
+		var { data } = await axios({
+			method: 'post',
+			url: `http${printer.ssl ? 's' : ''}://${printer.ip}/api/job`,
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + printer.apikey
+			},
+			httpsAgent: new https.Agent({
+				rejectUnauthorized: false
+			}),
+			data: {
+				command: 'cancel'
+			},
+			timeout: 1000
+		});
+		return data;
+	} catch (error) {
+		// Printers should only be able to be cancelled if online, so this is an issue we want to log.
+		console.log(error);
+		if (process.env.NODE_ENV === 'production') {
+			Sentry.captureException(error);
 		}
-	});
+		return null;
+	}
 }
 
 export async function getPrinterFromDb(

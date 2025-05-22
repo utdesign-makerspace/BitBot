@@ -33,7 +33,7 @@ export const printers: Record<string, Printer> = {
 		name: 'Virgo',
 		ip: 'virgo.internal.utd.ms',
 		model: 'Prusa MK4',
-		apikey: process.env.WHITE_APIKEY ?? '',
+		apikey: process.env.VIRGO_APIKEY ?? '',
 		color: '#e6e7e8',
 		thumbnail: 'https://i.imgur.com/cGBnk8K.png',
 		enabled: true,

@@ -17,7 +17,6 @@ module.exports = {
 	ephemeral: true,
 	async execute(interaction: Discord.ChatInputCommandInteraction) {
 		const printerID = interaction.options.getString('printer');
-		interaction.deferReply({ ephemeral: true });
 
 		let msg;
 

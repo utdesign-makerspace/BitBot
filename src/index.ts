@@ -314,7 +314,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 
 	if (interaction.isStringSelectMenu()) {
 		if (interaction.customId === constants.status.printerSelectId) {
-			interaction.deferUpdate();
+			const deferredUpdate = await interaction.deferUpdate();
 
 			// Grab our arguments
 			const printerID = interaction.values[0];
@@ -375,7 +375,7 @@ client.on('interactionCreate', async (interaction: Discord.Interaction) => {
 				buttonRow.addComponents(cancelButton);
 
 			msg.components = [printerRow, buttonRow];
-			await interaction.editReply(msg);
+			await deferredUpdate.edit(msg);
 		}
 	}
 
